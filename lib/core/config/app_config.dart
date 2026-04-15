@@ -6,7 +6,7 @@ abstract final class AppConfig {
 
   static const apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://localhost:2044/api',
+    defaultValue: 'http://localhost:2043/api',
   );
 
   static const maxFamilyMembers = 5;
