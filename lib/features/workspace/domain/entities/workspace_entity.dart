@@ -1,0 +1,123 @@
+class WorkspaceEntity {
+  const WorkspaceEntity({
+    required this.workspaceId,
+    required this.name,
+    required this.slug,
+    required this.workspaceTypeId,
+    required this.workspaceType,
+    required this.isPublic,
+    required this.isVerified,
+    required this.role,
+    required this.joinedOn,
+    required this.memberCount,
+    required this.pollCount,
+    required this.createdBy,
+    required this.createdOn,
+  });
+
+  final int workspaceId;
+  final String name;
+  final String slug;
+  final int workspaceTypeId;
+  final String workspaceType;
+  final bool isPublic;
+  final bool isVerified;
+  final String role;
+  final String joinedOn;
+  final int memberCount;
+  final int pollCount;
+  final int createdBy;
+  final String createdOn;
+}
+
+class WorkspaceMemberEntity {
+  const WorkspaceMemberEntity({
+    required this.userId,
+    required this.name,
+    required this.email,
+    required this.mobileNumber,
+    required this.role,
+    required this.status,
+    required this.joinedOn,
+    required this.isApproved,
+    required this.invitedBy,
+  });
+
+  final int userId;
+  final String name;
+  final String email;
+  final String mobileNumber;
+  final String role;
+  final String status;
+  final String joinedOn;
+  final bool isApproved;
+  final String invitedBy;
+}
+
+class WorkspaceVerificationEntity {
+  const WorkspaceVerificationEntity({
+    required this.workspaceId,
+    required this.statusName,
+    required this.isVerified,
+    this.reviewedAt,
+  });
+
+  final int workspaceId;
+  final String statusName;
+  final bool isVerified;
+  final String? reviewedAt;
+}
+
+class WorkspaceInviteEntity {
+  const WorkspaceInviteEntity({
+    required this.workspaceId,
+    required this.workspaceName,
+    required this.workspaceTypeName,
+    required this.invitedByUserId,
+    required this.invitedByName,
+    required this.invitedOn,
+    required this.slug,
+    required this.isPublic,
+    required this.isVerified,
+    required this.role,
+  });
+
+  final int workspaceId;
+  final String workspaceName;
+  final String workspaceTypeName;
+  final int invitedByUserId;
+  final String invitedByName;
+  final String invitedOn;
+  final String slug;
+  final bool isPublic;
+  final bool isVerified;
+  final String role;
+}
+
+class WorkspaceTypeEntity {
+  const WorkspaceTypeEntity({
+    required this.workspaceTypeId,
+    required this.name,
+  });
+
+  final int workspaceTypeId;
+  final String name;
+}
+
+class WorkspaceSearchResultEntity {
+  const WorkspaceSearchResultEntity({
+    required this.workspaceId,
+    required this.name,
+    required this.workspaceTypeName,
+    required this.verificationStatusName,
+    required this.isVerified,
+    required this.memberCount,
+  });
+
+  final int workspaceId;
+  final String name;
+  final String workspaceTypeName;
+  final String verificationStatusName;
+  final bool isVerified;
+  final int memberCount;
+}
