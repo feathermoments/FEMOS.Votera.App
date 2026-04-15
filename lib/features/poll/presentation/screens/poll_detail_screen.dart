@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:votera_app/core/di/service_locator.dart';
+import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/storage/secure_storage.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
@@ -130,255 +131,270 @@ class _PollDetailViewState extends State<_PollDetailView> {
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ── Trust banner ──────────────────────────────────
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.blue.withAlpha(10),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppColors.blue.withAlpha(40),
-                      width: 1,
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: kContentMaxWidth),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ── Trust banner ──────────────────────────────────
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.blue.withAlpha(10),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.blue.withAlpha(40),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(7),
+                            decoration: BoxDecoration(
+                              color: AppColors.blue.withAlpha(20),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.verified_user_outlined,
+                              color: AppColors.blue,
+                              size: 16,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: RichText(
+                              text: TextSpan(
+                                style: AppTypography.captionSmall.copyWith(
+                                  color: AppColors.textSecondary,
+                                  height: 1.45,
+                                ),
+                                children: const [
+                                  TextSpan(
+                                    text: 'Your voice matters. ',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text:
+                                        'Votera keeps it heard—and protected.',
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(7),
-                        decoration: BoxDecoration(
-                          color: AppColors.blue.withAlpha(20),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.verified_user_outlined,
-                          color: AppColors.blue,
-                          size: 16,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: RichText(
-                          text: TextSpan(
-                            style: AppTypography.captionSmall.copyWith(
-                              color: AppColors.textSecondary,
-                              height: 1.45,
-                            ),
-                            children: const [
-                              TextSpan(
-                                text: 'Your voice matters. ',
-                                style: TextStyle(fontWeight: FontWeight.w700),
-                              ),
-                              TextSpan(
-                                text: 'Votera keeps it heard—and protected.',
-                              ),
-                            ],
+                    const SizedBox(height: 20),
+
+                    // ── Question ──────────────────────────────────────
+                    Text(
+                      _detail!.question,
+                      style: AppTypography.sectionHeading,
+                    ),
+                    if (_detail!.isAnonymous) ...[
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.visibility_off_outlined,
+                            size: 14,
+                            color: AppColors.textMuted,
                           ),
-                        ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Anonymous poll',
+                            style: AppTypography.captionSmall,
+                          ),
+                        ],
                       ),
                     ],
-                  ),
-                ),
-                const SizedBox(height: 20),
+                    const SizedBox(height: 24),
 
-                // ── Question ──────────────────────────────────────
-                Text(_detail!.question, style: AppTypography.sectionHeading),
-                if (_detail!.isAnonymous) ...[
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.visibility_off_outlined,
-                        size: 14,
-                        color: AppColors.textMuted,
+                    // ── Vote section ─────────────────────────────────
+                    if (_results.isEmpty) ...[
+                      Text(
+                        _hasVoted ? 'Your vote' : 'Cast your vote',
+                        style: AppTypography.label,
                       ),
-                      const SizedBox(width: 4),
-                      Text('Anonymous poll', style: AppTypography.captionSmall),
-                    ],
-                  ),
-                ],
-                const SizedBox(height: 24),
-
-                // ── Vote section ─────────────────────────────────
-                if (_results.isEmpty) ...[
-                  Text(
-                    _hasVoted ? 'Your vote' : 'Cast your vote',
-                    style: AppTypography.label,
-                  ),
-                  const SizedBox(height: 12),
-                  ..._detail!.options.map((option) {
-                    final selected = _selectedOptionId == option.optionId;
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: InkWell(
-                        onTap: (_isVoting || _hasVoted)
-                            ? null
-                            : () => setState(
-                                () => _selectedOptionId = option.optionId,
-                              ),
-                        borderRadius: BorderRadius.circular(10),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 150),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
-                          ),
-                          decoration: BoxDecoration(
-                            color: selected
-                                ? AppColors.blue.withAlpha(15)
-                                : Theme.of(
-                                    context,
-                                  ).colorScheme.surfaceContainerHighest,
+                      const SizedBox(height: 12),
+                      ..._detail!.options.map((option) {
+                        final selected = _selectedOptionId == option.optionId;
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: InkWell(
+                            onTap: (_isVoting || _hasVoted)
+                                ? null
+                                : () => setState(
+                                    () => _selectedOptionId = option.optionId,
+                                  ),
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: selected
-                                  ? AppColors.blue
-                                  : AppColors.metallicBorder,
-                              width: selected ? 1.5 : 1,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                selected
-                                    ? Icons.radio_button_checked
-                                    : Icons.radio_button_off,
-                                color: selected
-                                    ? AppColors.blue
-                                    : AppColors.textMuted,
-                                size: 20,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 150),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  option.text,
-                                  style: AppTypography.bodySmall.copyWith(
+                              decoration: BoxDecoration(
+                                color: selected
+                                    ? AppColors.blue.withAlpha(15)
+                                    : Theme.of(
+                                        context,
+                                      ).colorScheme.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: selected
+                                      ? AppColors.blue
+                                      : AppColors.metallicBorder,
+                                  width: selected ? 1.5 : 1,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    selected
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_off,
                                     color: selected
                                         ? AppColors.blue
-                                        : (_hasVoted
-                                              ? AppColors.textMuted
-                                              : Theme.of(
-                                                  context,
-                                                ).colorScheme.onSurface),
-                                    fontWeight: selected
-                                        ? FontWeight.w700
-                                        : FontWeight.w500,
+                                        : AppColors.textMuted,
+                                    size: 20,
                                   ),
-                                ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      option.text,
+                                      style: AppTypography.bodySmall.copyWith(
+                                        color: selected
+                                            ? AppColors.blue
+                                            : (_hasVoted
+                                                  ? AppColors.textMuted
+                                                  : Theme.of(
+                                                      context,
+                                                    ).colorScheme.onSurface),
+                                        fontWeight: selected
+                                            ? FontWeight.w700
+                                            : FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                  if (_hasVoted && selected) ...[
+                                    const SizedBox(width: 8),
+                                    const Icon(
+                                      Icons.check_circle,
+                                      color: AppColors.blue,
+                                      size: 18,
+                                    ),
+                                  ],
+                                ],
                               ),
-                              if (_hasVoted && selected) ...[
-                                const SizedBox(width: 8),
-                                const Icon(
-                                  Icons.check_circle,
-                                  color: AppColors.blue,
-                                  size: 18,
-                                ),
-                              ],
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                  }),
-                  const SizedBox(height: 20),
-                  if (_hasVoted) ...[
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: OutlinedButton.icon(
-                        onPressed: _isLoadingResults
-                            ? null
-                            : () {
-                                setState(() => _isLoadingResults = true);
-                                context.read<PollCubit>().loadResults(
-                                  widget.pollId,
-                                );
-                              },
-                        icon: _isLoadingResults
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Icon(Icons.bar_chart_rounded),
-                        label: const Text(
-                          'View Results',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.blue,
-                          side: const BorderSide(color: AppColors.blue),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'You have already voted on this poll',
-                      style: AppTypography.captionSmall.copyWith(
-                        color: AppColors.textMuted,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ] else ...[
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: (_selectedOptionId == null || _isVoting)
-                            ? null
-                            : _castVote,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.blue,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: _isVoting
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Text(
-                                'Submit Vote',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                        );
+                      }),
+                      const SizedBox(height: 20),
+                      if (_hasVoted) ...[
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: OutlinedButton.icon(
+                            onPressed: _isLoadingResults
+                                ? null
+                                : () {
+                                    setState(() => _isLoadingResults = true);
+                                    context.read<PollCubit>().loadResults(
+                                      widget.pollId,
+                                    );
+                                  },
+                            icon: _isLoadingResults
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.bar_chart_rounded),
+                            label: const Text(
+                              'View Results',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
                               ),
-                      ),
-                    ),
-                  ],
-                ],
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.blue,
+                              side: const BorderSide(color: AppColors.blue),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'You have already voted on this poll',
+                          style: AppTypography.captionSmall.copyWith(
+                            color: AppColors.textMuted,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ] else ...[
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: (_selectedOptionId == null || _isVoting)
+                                ? null
+                                : _castVote,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.blue,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: _isVoting
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text(
+                                    'Submit Vote',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ],
+                    ],
 
-                // ── Results section ───────────────────────────────
-                if (_isLoadingResults) ...[
-                  const SizedBox(height: 32),
-                  const Center(child: CircularProgressIndicator()),
-                ] else if (_results.isNotEmpty) ...[
-                  Text('Results', style: AppTypography.label),
-                  const SizedBox(height: 12),
-                  ..._results.map((r) => _ResultBar(result: r)),
-                ],
-              ],
+                    // ── Results section ───────────────────────────────
+                    if (_isLoadingResults) ...[
+                      const SizedBox(height: 32),
+                      const Center(child: CircularProgressIndicator()),
+                    ] else if (_results.isNotEmpty) ...[
+                      Text('Results', style: AppTypography.label),
+                      const SizedBox(height: 12),
+                      ..._results.map((r) => _ResultBar(result: r)),
+                    ],
+                  ],
+                ),
+              ),
             ),
           );
         },

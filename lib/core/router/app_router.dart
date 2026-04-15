@@ -81,12 +81,6 @@ abstract final class AppRouter {
           builder: (_) => WorkspaceVerificationScreen(workspaceId: id),
           settings: settings,
         );
-      case RouteNames.workspaceInbox:
-        final userId = settings.arguments as int;
-        return MaterialPageRoute(
-          builder: (_) => WorkspaceInboxScreen(userId: userId),
-          settings: settings,
-        );
       case RouteNames.polls:
         final userId = settings.arguments as int;
         return MaterialPageRoute(

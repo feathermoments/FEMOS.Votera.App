@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
@@ -63,22 +64,44 @@ class _WorkspaceListView extends StatelessWidget {
             return RefreshIndicator(
               onRefresh: () =>
                   context.read<WorkspaceCubit>().loadUserWorkspaces(),
-              child: ListView.separated(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                itemCount: state.workspaces.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 10),
-                itemBuilder: (context, i) {
-                  final ws = state.workspaces[i];
-                  return _WorkspaceCard(
-                    workspace: ws,
-                    onTap: () => Navigator.pushNamed(
-                      context,
-                      RouteNames.workspaceDetail,
-                      arguments: ws.workspaceId,
+              child: context.isWide
+                  ? GridView.builder(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: context.isDesktop ? 3 : 2,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 2.0,
+                      ),
+                      itemCount: state.workspaces.length,
+                      itemBuilder: (context, i) {
+                        final ws = state.workspaces[i];
+                        return _WorkspaceCard(
+                          workspace: ws,
+                          onTap: () => Navigator.pushNamed(
+                            context,
+                            RouteNames.workspaceDetail,
+                            arguments: ws.workspaceId,
+                          ),
+                        );
+                      },
+                    )
+                  : ListView.separated(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                      itemCount: state.workspaces.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      itemBuilder: (context, i) {
+                        final ws = state.workspaces[i];
+                        return _WorkspaceCard(
+                          workspace: ws,
+                          onTap: () => Navigator.pushNamed(
+                            context,
+                            RouteNames.workspaceDetail,
+                            arguments: ws.workspaceId,
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             );
           }
           return const SizedBox.shrink();

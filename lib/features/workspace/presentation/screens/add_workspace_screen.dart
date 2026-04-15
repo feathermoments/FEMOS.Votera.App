@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
 import 'package:votera_app/features/workspace/domain/entities/workspace_entity.dart';
@@ -76,167 +77,174 @@ class _AddWorkspaceViewState extends State<_AddWorkspaceView> {
       },
       child: Scaffold(
         appBar: AppBar(title: const Text('Create Workspace')),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // ── Header card ───────────────────────────────
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: AppColors.blueGradient,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Row(
-                    children: [
-                      Icon(
-                        Icons.workspaces_rounded,
-                        color: Colors.white,
-                        size: 32,
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: kContentMaxWidth),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // ── Header card ───────────────────────────────
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        gradient: AppColors.blueGradient,
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'New Workspace',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            SizedBox(height: 2),
-                            Text(
-                              'Create a space to manage polls with your team',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 28),
-                // ── Name ─────────────────────────────────────
-                Text('Workspace Name', style: AppTypography.sectionHeading),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _nameCtrl,
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    hintText: 'e.g. Acme Corp, Dev Team',
-                    prefixIcon: Icon(Icons.business_outlined),
-                  ),
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return 'Name is required';
-                    }
-                    if (v.trim().length < 3) {
-                      return 'At least 3 characters required';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 20),
-                // ── Type ─────────────────────────────────────
-                Text('Workspace Type', style: AppTypography.sectionHeading),
-                const SizedBox(height: 8),
-                if (_types.isEmpty)
-                  const SizedBox(
-                    height: 56,
-                    child: Center(
-                      child: SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    ),
-                  )
-                else
-                  DropdownButtonFormField<int>(
-                    initialValue: _typeId,
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.category_outlined),
-                    ),
-                    items: _types
-                        .map(
-                          (t) => DropdownMenuItem<int>(
-                            value: t.workspaceTypeId,
-                            child: Text(t.name),
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.workspaces_rounded,
+                            color: Colors.white,
+                            size: 32,
                           ),
-                        )
-                        .toList(),
-                    onChanged: (v) => setState(() => _typeId = v),
-                  ),
-                const SizedBox(height: 20),
-                // ── Visibility ───────────────────────────────
-                Text('Visibility', style: AppTypography.sectionHeading),
-                const SizedBox(height: 8),
-                Card(
-                  child: SwitchListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 4,
-                    ),
-                    title: Text(
-                      'Public Workspace',
-                      style: AppTypography.cardTitle,
-                    ),
-                    subtitle: Text(
-                      _isPublic
-                          ? 'Anyone can find and request to join'
-                          : 'Only invited members can join',
-                      style: AppTypography.caption,
-                    ),
-                    secondary: Icon(
-                      _isPublic
-                          ? Icons.public_rounded
-                          : Icons.lock_outline_rounded,
-                      color: _isPublic
-                          ? AppColors.success
-                          : AppColors.textMuted,
-                    ),
-                    value: _isPublic,
-                    activeThumbColor: AppColors.blue,
-                    onChanged: (v) => setState(() => _isPublic = v),
-                  ),
-                ),
-                const SizedBox(height: 36),
-                // ── Submit ───────────────────────────────────
-                BlocBuilder<WorkspaceCubit, WorkspaceState>(
-                  builder: (context, state) {
-                    return SizedBox(
-                      height: 52,
-                      child: ElevatedButton.icon(
-                        onPressed: state is WorkspaceLoading ? null : _submit,
-                        icon: state is WorkspaceLoading
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  color: Colors.white,
+                          SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'New Workspace',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
-                              )
-                            : const Icon(Icons.workspaces_rounded),
-                        label: Text(
-                          state is WorkspaceLoading
-                              ? 'Creating...'
-                              : 'Create Workspace',
-                        ),
+                                SizedBox(height: 2),
+                                Text(
+                                  'Create a space to manage polls with your team',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  },
+                    ),
+                    const SizedBox(height: 28),
+                    // ── Name ─────────────────────────────────────
+                    Text('Workspace Name', style: AppTypography.sectionHeading),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _nameCtrl,
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
+                        hintText: 'e.g. Acme Corp, Dev Team',
+                        prefixIcon: Icon(Icons.business_outlined),
+                      ),
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) {
+                          return 'Name is required';
+                        }
+                        if (v.trim().length < 3) {
+                          return 'At least 3 characters required';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    // ── Type ─────────────────────────────────────
+                    Text('Workspace Type', style: AppTypography.sectionHeading),
+                    const SizedBox(height: 8),
+                    if (_types.isEmpty)
+                      const SizedBox(
+                        height: 56,
+                        child: Center(
+                          child: SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                      )
+                    else
+                      DropdownButtonFormField<int>(
+                        initialValue: _typeId,
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.category_outlined),
+                        ),
+                        items: _types
+                            .map(
+                              (t) => DropdownMenuItem<int>(
+                                value: t.workspaceTypeId,
+                                child: Text(t.name),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (v) => setState(() => _typeId = v),
+                      ),
+                    const SizedBox(height: 20),
+                    // ── Visibility ───────────────────────────────
+                    Text('Visibility', style: AppTypography.sectionHeading),
+                    const SizedBox(height: 8),
+                    Card(
+                      child: SwitchListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        title: Text(
+                          'Public Workspace',
+                          style: AppTypography.cardTitle,
+                        ),
+                        subtitle: Text(
+                          _isPublic
+                              ? 'Anyone can find and request to join'
+                              : 'Only invited members can join',
+                          style: AppTypography.caption,
+                        ),
+                        secondary: Icon(
+                          _isPublic
+                              ? Icons.public_rounded
+                              : Icons.lock_outline_rounded,
+                          color: _isPublic
+                              ? AppColors.success
+                              : AppColors.textMuted,
+                        ),
+                        value: _isPublic,
+                        activeThumbColor: AppColors.blue,
+                        onChanged: (v) => setState(() => _isPublic = v),
+                      ),
+                    ),
+                    const SizedBox(height: 36),
+                    // ── Submit ───────────────────────────────────
+                    BlocBuilder<WorkspaceCubit, WorkspaceState>(
+                      builder: (context, state) {
+                        return SizedBox(
+                          height: 52,
+                          child: ElevatedButton.icon(
+                            onPressed: state is WorkspaceLoading
+                                ? null
+                                : _submit,
+                            icon: state is WorkspaceLoading
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Icon(Icons.workspaces_rounded),
+                            label: Text(
+                              state is WorkspaceLoading
+                                  ? 'Creating...'
+                                  : 'Create Workspace',
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

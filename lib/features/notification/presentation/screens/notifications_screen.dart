@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/features/notification/domain/entities/notification_entity.dart';
 import 'package:votera_app/features/notification/presentation/cubit/notification_cubit.dart';
@@ -120,22 +121,27 @@ class _NotificationsView extends StatelessWidget {
           return RefreshIndicator(
             onRefresh: () => context.read<NotificationCubit>().load(),
             color: AppColors.blue,
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              itemCount: notifications.length,
-              separatorBuilder: (_, __) =>
-                  const Divider(height: 1, indent: 72, endIndent: 16),
-              itemBuilder: (context, index) {
-                final item = notifications[index];
-                return _NotificationTile(
-                  notification: item,
-                  onTap: () {
-                    if (!item.isRead) {
-                      context.read<NotificationCubit>().markAsRead(item.id);
-                    }
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: kContentMaxWidth),
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  itemCount: notifications.length,
+                  separatorBuilder: (_, __) =>
+                      const Divider(height: 1, indent: 72, endIndent: 16),
+                  itemBuilder: (context, index) {
+                    final item = notifications[index];
+                    return _NotificationTile(
+                      notification: item,
+                      onTap: () {
+                        if (!item.isRead) {
+                          context.read<NotificationCubit>().markAsRead(item.id);
+                        }
+                      },
+                    );
                   },
-                );
-              },
+                ),
+              ),
             ),
           );
         },

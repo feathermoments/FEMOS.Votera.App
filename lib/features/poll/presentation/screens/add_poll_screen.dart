@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
@@ -179,260 +180,274 @@ class _AddPollFormState extends State<_AddPollForm> {
           },
           builder: (context, pollState) {
             final isLoading = pollState is PollLoading;
-            return Form(
-              key: _formKey,
-              child: ListView(
-                padding: const EdgeInsets.all(20),
-                children: [
-                  // ── Question ────────────────────────────────────────
-                  _FieldLabel('Question'),
-                  const SizedBox(height: 6),
-                  TextFormField(
-                    controller: _questionCtrl,
-                    maxLines: 3,
-                    decoration: _inputDecoration('Enter your question...'),
-                    validator: (v) => (v == null || v.trim().isEmpty)
-                        ? 'Question is required'
-                        : null,
-                  ),
-                  const SizedBox(height: 18),
-
-                  // ── Workspace ───────────────────────────────────────
-                  _FieldLabel('Workspace'),
-                  const SizedBox(height: 6),
-                  BlocBuilder<WorkspaceCubit, WorkspaceState>(
-                    builder: (context, state) {
-                      final workspaces = state is WorkspaceListLoaded
-                          ? state.workspaces
-                                .where((w) => w.role.toLowerCase() == 'admin')
-                                .toList()
-                          : <WorkspaceEntity>[];
-                      return DropdownButtonFormField<int>(
-                        initialValue: _workspaceId,
-                        decoration: _inputDecoration('Select workspace'),
-                        items: workspaces
-                            .map(
-                              (w) => DropdownMenuItem(
-                                value: w.workspaceId,
-                                child: Text(w.name),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (v) {
-                          setState(() {
-                            _workspaceId = v;
-                            _categoryId = null;
-                          });
-                          if (v != null) {
-                            context.read<CategoryCubit>().loadCategories(v);
-                          }
-                        },
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 18),
-
-                  // ── Category ────────────────────────────────────────
-                  _FieldLabel('Category'),
-                  const SizedBox(height: 6),
-                  BlocBuilder<CategoryCubit, CategoryState>(
-                    builder: (context, state) {
-                      final cats = state is CategoryLoaded
-                          ? state.categories
-                          : <CategoryEntity>[];
-                      return DropdownButtonFormField<int>(
-                        initialValue: _categoryId,
-                        decoration: _inputDecoration('Select category'),
-                        items: cats
-                            .map(
-                              (c) => DropdownMenuItem(
-                                value: c.categoryId,
-                                child: Text(c.name),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (v) => setState(() => _categoryId = v),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 18),
-
-                  // ── Visibility ──────────────────────────────────────
-                  _FieldLabel('Visibility'),
-                  const SizedBox(height: 6),
-                  DropdownButtonFormField<String>(
-                    initialValue: _visibility,
-                    decoration: _inputDecoration('Select visibility'),
-                    items: _visibilityOptions
-                        .map(
-                          (v) => DropdownMenuItem(
-                            value: v,
-                            child: Text(_capitalize(v)),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (v) =>
-                        setState(() => _visibility = v ?? _visibility),
-                  ),
-                  const SizedBox(height: 18),
-
-                  // ── Options ─────────────────────────────────────────
-                  Row(
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: kContentMaxWidth),
+                child: Form(
+                  key: _formKey,
+                  child: ListView(
+                    padding: const EdgeInsets.all(20),
                     children: [
-                      _FieldLabel('Options'),
-                      const Spacer(),
-                      Text(
-                        '${_optionCtrls.length}/$_maxOptions',
-                        style: AppTypography.captionSmall,
+                      // ── Question ────────────────────────────────────────
+                      _FieldLabel('Question'),
+                      const SizedBox(height: 6),
+                      TextFormField(
+                        controller: _questionCtrl,
+                        maxLines: 3,
+                        decoration: _inputDecoration('Enter your question...'),
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? 'Question is required'
+                            : null,
                       ),
+                      const SizedBox(height: 18),
+
+                      // ── Workspace ───────────────────────────────────────
+                      _FieldLabel('Workspace'),
+                      const SizedBox(height: 6),
+                      BlocBuilder<WorkspaceCubit, WorkspaceState>(
+                        builder: (context, state) {
+                          final workspaces = state is WorkspaceListLoaded
+                              ? state.workspaces
+                                    .where(
+                                      (w) => w.role.toLowerCase() == 'admin',
+                                    )
+                                    .toList()
+                              : <WorkspaceEntity>[];
+                          return DropdownButtonFormField<int>(
+                            initialValue: _workspaceId,
+                            decoration: _inputDecoration('Select workspace'),
+                            items: workspaces
+                                .map(
+                                  (w) => DropdownMenuItem(
+                                    value: w.workspaceId,
+                                    child: Text(w.name),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (v) {
+                              setState(() {
+                                _workspaceId = v;
+                                _categoryId = null;
+                              });
+                              if (v != null) {
+                                context.read<CategoryCubit>().loadCategories(v);
+                              }
+                            },
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 18),
+
+                      // ── Category ────────────────────────────────────────
+                      _FieldLabel('Category'),
+                      const SizedBox(height: 6),
+                      BlocBuilder<CategoryCubit, CategoryState>(
+                        builder: (context, state) {
+                          final cats = state is CategoryLoaded
+                              ? state.categories
+                              : <CategoryEntity>[];
+                          return DropdownButtonFormField<int>(
+                            initialValue: _categoryId,
+                            decoration: _inputDecoration('Select category'),
+                            items: cats
+                                .map(
+                                  (c) => DropdownMenuItem(
+                                    value: c.categoryId,
+                                    child: Text(c.name),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (v) => setState(() => _categoryId = v),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 18),
+
+                      // ── Visibility ──────────────────────────────────────
+                      _FieldLabel('Visibility'),
+                      const SizedBox(height: 6),
+                      DropdownButtonFormField<String>(
+                        initialValue: _visibility,
+                        decoration: _inputDecoration('Select visibility'),
+                        items: _visibilityOptions
+                            .map(
+                              (v) => DropdownMenuItem(
+                                value: v,
+                                child: Text(_capitalize(v)),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (v) =>
+                            setState(() => _visibility = v ?? _visibility),
+                      ),
+                      const SizedBox(height: 18),
+
+                      // ── Options ─────────────────────────────────────────
+                      Row(
+                        children: [
+                          _FieldLabel('Options'),
+                          const Spacer(),
+                          Text(
+                            '${_optionCtrls.length}/$_maxOptions',
+                            style: AppTypography.captionSmall,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      ...List.generate(_optionCtrls.length, (i) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _optionCtrls[i],
+                                  decoration: _inputDecoration(
+                                    'Option ${i + 1}',
+                                  ),
+                                  validator: (v) =>
+                                      (v == null || v.trim().isEmpty)
+                                      ? 'Option cannot be empty'
+                                      : null,
+                                ),
+                              ),
+                              if (_optionCtrls.length > 2)
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 6),
+                                  child: GestureDetector(
+                                    onTap: () => _removeOption(i),
+                                    child: const Icon(
+                                      Icons.remove_circle_outline,
+                                      color: AppColors.error,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        );
+                      }),
+                      if (_optionCtrls.length < _maxOptions)
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextButton.icon(
+                            onPressed: _addOption,
+                            icon: const Icon(
+                              Icons.add_circle_outline,
+                              size: 18,
+                            ),
+                            label: const Text('Add Option'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppColors.blue,
+                              padding: EdgeInsets.zero,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 8),
+
+                      // ── Anonymous ───────────────────────────────────────
+                      Card(
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.outlineVariant,
+                          ),
+                        ),
+                        child: SwitchListTile(
+                          title: Text(
+                            'Anonymous Voting',
+                            style: AppTypography.bodySmall,
+                          ),
+                          subtitle: Text(
+                            'Voters\' identities will be hidden',
+                            style: AppTypography.captionSmall,
+                          ),
+                          value: _isAnonymous,
+                          activeThumbColor: AppColors.blue,
+                          onChanged: (v) => setState(() => _isAnonymous = v),
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+
+                      // ── Expiry Date ─────────────────────────────────────
+                      _FieldLabel('Expiry Date (optional)'),
+                      const SizedBox(height: 6),
+                      InkWell(
+                        onTap: _pickExpiry,
+                        borderRadius: BorderRadius.circular(10),
+                        child: InputDecorator(
+                          decoration: _inputDecoration('Tap to pick a date'),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  _expiryDate != null
+                                      ? '${_expiryDate!.day}/${_expiryDate!.month}/${_expiryDate!.year}'
+                                      : 'No expiry (open-ended)',
+                                  style: _expiryDate != null
+                                      ? AppTypography.bodySmall
+                                      : AppTypography.captionSmall,
+                                ),
+                              ),
+                              const Icon(
+                                Icons.calendar_today_outlined,
+                                size: 16,
+                                color: AppColors.textMuted,
+                              ),
+                              if (_expiryDate != null)
+                                GestureDetector(
+                                  onTap: () =>
+                                      setState(() => _expiryDate = null),
+                                  child: const Padding(
+                                    padding: EdgeInsets.only(left: 8),
+                                    child: Icon(
+                                      Icons.close,
+                                      size: 16,
+                                      color: AppColors.textMuted,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+
+                      // ── Submit ──────────────────────────────────────────
+                      SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: ElevatedButton(
+                          onPressed: isLoading ? null : _submit,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.blue,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: isLoading
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text(
+                                  'Create Poll',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
                     ],
                   ),
-                  const SizedBox(height: 6),
-                  ...List.generate(_optionCtrls.length, (i) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              controller: _optionCtrls[i],
-                              decoration: _inputDecoration('Option ${i + 1}'),
-                              validator: (v) => (v == null || v.trim().isEmpty)
-                                  ? 'Option cannot be empty'
-                                  : null,
-                            ),
-                          ),
-                          if (_optionCtrls.length > 2)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 6),
-                              child: GestureDetector(
-                                onTap: () => _removeOption(i),
-                                child: const Icon(
-                                  Icons.remove_circle_outline,
-                                  color: AppColors.error,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    );
-                  }),
-                  if (_optionCtrls.length < _maxOptions)
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextButton.icon(
-                        onPressed: _addOption,
-                        icon: const Icon(Icons.add_circle_outline, size: 18),
-                        label: const Text('Add Option'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppColors.blue,
-                          padding: EdgeInsets.zero,
-                        ),
-                      ),
-                    ),
-                  const SizedBox(height: 8),
-
-                  // ── Anonymous ───────────────────────────────────────
-                  Card(
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(
-                        color: Theme.of(context).colorScheme.outlineVariant,
-                      ),
-                    ),
-                    child: SwitchListTile(
-                      title: Text(
-                        'Anonymous Voting',
-                        style: AppTypography.bodySmall,
-                      ),
-                      subtitle: Text(
-                        'Voters\' identities will be hidden',
-                        style: AppTypography.captionSmall,
-                      ),
-                      value: _isAnonymous,
-                      activeThumbColor: AppColors.blue,
-                      onChanged: (v) => setState(() => _isAnonymous = v),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-
-                  // ── Expiry Date ─────────────────────────────────────
-                  _FieldLabel('Expiry Date (optional)'),
-                  const SizedBox(height: 6),
-                  InkWell(
-                    onTap: _pickExpiry,
-                    borderRadius: BorderRadius.circular(10),
-                    child: InputDecorator(
-                      decoration: _inputDecoration('Tap to pick a date'),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              _expiryDate != null
-                                  ? '${_expiryDate!.day}/${_expiryDate!.month}/${_expiryDate!.year}'
-                                  : 'No expiry (open-ended)',
-                              style: _expiryDate != null
-                                  ? AppTypography.bodySmall
-                                  : AppTypography.captionSmall,
-                            ),
-                          ),
-                          const Icon(
-                            Icons.calendar_today_outlined,
-                            size: 16,
-                            color: AppColors.textMuted,
-                          ),
-                          if (_expiryDate != null)
-                            GestureDetector(
-                              onTap: () => setState(() => _expiryDate = null),
-                              child: const Padding(
-                                padding: EdgeInsets.only(left: 8),
-                                child: Icon(
-                                  Icons.close,
-                                  size: 16,
-                                  color: AppColors.textMuted,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-
-                  // ── Submit ──────────────────────────────────────────
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      onPressed: isLoading ? null : _submit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.blue,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: isLoading
-                          ? const SizedBox(
-                              width: 22,
-                              height: 22,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : const Text(
-                              'Create Poll',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
+                ),
               ),
             );
           },

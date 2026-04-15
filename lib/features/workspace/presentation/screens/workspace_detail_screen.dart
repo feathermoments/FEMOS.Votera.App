@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
@@ -178,148 +179,154 @@ class _OverviewTab extends StatelessWidget {
     }
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Banner ───────────────────────────────────────
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: AppColors.blueGradient,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(30),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Center(
-                    child: Text(
-                      ws.name.isNotEmpty ? ws.name[0].toUpperCase() : 'W',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: kWideMaxWidth),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Banner ───────────────────────────────────────
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: AppColors.blueGradient,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(30),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Center(
+                        child: Text(
+                          ws.name.isNotEmpty ? ws.name[0].toUpperCase() : 'W',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 26,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: Text(
-                              ws.name,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  ws.name,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                               ),
+                              if (ws.isVerified)
+                                const Icon(
+                                  Icons.verified_rounded,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            ws.slug,
+                            style: const TextStyle(
+                              color: Colors.white60,
+                              fontSize: 12,
                             ),
                           ),
-                          if (ws.isVerified)
-                            const Icon(
-                              Icons.verified_rounded,
-                              color: Colors.white,
-                              size: 18,
-                            ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        ws.slug,
-                        style: const TextStyle(
-                          color: Colors.white60,
-                          fontSize: 12,
-                        ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              // ── Stats ─────────────────────────────────────────
+              Row(
+                children: [
+                  Expanded(
+                    child: _StatCard(
+                      icon: Icons.people_outline_rounded,
+                      label: 'Members',
+                      value: '${ws.memberCount}',
+                      color: AppColors.blue,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _StatCard(
+                      icon: Icons.poll_outlined,
+                      label: 'Polls',
+                      value: '${ws.pollCount}',
+                      color: AppColors.info,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              // ── Details ───────────────────────────────────────
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      _DetailRow(
+                        icon: Icons.category_outlined,
+                        label: 'Type',
+                        value: ws.workspaceType,
+                      ),
+                      const Divider(height: 20),
+                      _DetailRow(
+                        icon: ws.isPublic
+                            ? Icons.public_rounded
+                            : Icons.lock_outline_rounded,
+                        label: 'Visibility',
+                        value: ws.isPublic ? 'Public' : 'Private',
+                      ),
+                      const Divider(height: 20),
+                      _DetailRow(
+                        icon: Icons.badge_outlined,
+                        label: 'Your Role',
+                        value: ws.role,
+                      ),
+                      const Divider(height: 20),
+                      _DetailRow(
+                        icon: Icons.verified_user_outlined,
+                        label: 'Verified',
+                        value: ws.isVerified ? 'Yes' : 'No',
+                      ),
+                      const Divider(height: 20),
+                      _DetailRow(
+                        icon: Icons.calendar_today_outlined,
+                        label: 'Joined',
+                        value: ws.joinedOn,
+                      ),
+                      const Divider(height: 20),
+                      _DetailRow(
+                        icon: Icons.access_time_rounded,
+                        label: 'Created',
+                        value: ws.createdOn,
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          // ── Stats ─────────────────────────────────────────
-          Row(
-            children: [
-              Expanded(
-                child: _StatCard(
-                  icon: Icons.people_outline_rounded,
-                  label: 'Members',
-                  value: '${ws.memberCount}',
-                  color: AppColors.blue,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _StatCard(
-                  icon: Icons.poll_outlined,
-                  label: 'Polls',
-                  value: '${ws.pollCount}',
-                  color: AppColors.info,
-                ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          // ── Details ───────────────────────────────────────
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  _DetailRow(
-                    icon: Icons.category_outlined,
-                    label: 'Type',
-                    value: ws.workspaceType,
-                  ),
-                  const Divider(height: 20),
-                  _DetailRow(
-                    icon: ws.isPublic
-                        ? Icons.public_rounded
-                        : Icons.lock_outline_rounded,
-                    label: 'Visibility',
-                    value: ws.isPublic ? 'Public' : 'Private',
-                  ),
-                  const Divider(height: 20),
-                  _DetailRow(
-                    icon: Icons.badge_outlined,
-                    label: 'Your Role',
-                    value: ws.role,
-                  ),
-                  const Divider(height: 20),
-                  _DetailRow(
-                    icon: Icons.verified_user_outlined,
-                    label: 'Verified',
-                    value: ws.isVerified ? 'Yes' : 'No',
-                  ),
-                  const Divider(height: 20),
-                  _DetailRow(
-                    icon: Icons.calendar_today_outlined,
-                    label: 'Joined',
-                    value: ws.joinedOn,
-                  ),
-                  const Divider(height: 20),
-                  _DetailRow(
-                    icon: Icons.access_time_rounded,
-                    label: 'Created',
-                    value: ws.createdOn,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

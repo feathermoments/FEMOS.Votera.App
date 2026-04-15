@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:votera_app/core/di/service_locator.dart';
+import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/storage/local_storage.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
@@ -198,109 +199,116 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ? const Center(child: CircularProgressIndicator())
           : BlocBuilder<ThemeCubit, ThemeMode>(
               builder: (context, themeMode) {
-                return ListView(
-                  children: [
-                    // ── APPEARANCE ───────────────────────────
-                    _SectionHeader('APPEARANCE'),
-                    _SettingsTile(
-                      icon: _themeIcon(themeMode),
-                      iconColor: AppColors.blue,
-                      title: 'Theme',
-                      subtitle: _themeName(themeMode),
-                      onTap: () => _showThemePicker(context, themeMode),
+                return Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxWidth: kContentMaxWidth,
                     ),
-
-                    // ── NOTIFICATIONS ────────────────────────
-                    _SectionHeader('NOTIFICATIONS'),
-                    _SettingsToggleTile(
-                      icon: Icons.notifications_outlined,
-                      iconColor: const Color(0xFFF59E0B),
-                      title: 'Push Notifications',
-                      subtitle: 'Receive alerts for polls and updates',
-                      value: _notificationsEnabled,
-                      onChanged: (val) {
-                        setState(() => _notificationsEnabled = val);
-                        _prefs.notificationsEnabled = val;
-                      },
-                    ),
-
-                    // ── ACCOUNT ──────────────────────────────
-                    _SectionHeader('ACCOUNT'),
-                    _SettingsTile(
-                      icon: Icons.person_outline_rounded,
-                      iconColor: const Color(0xFF10B981),
-                      title: 'Edit Profile',
-                      onTap: () =>
-                          Navigator.pushNamed(context, RouteNames.profile),
-                    ),
-                    _SettingsTile(
-                      icon: Icons.delete_forever_outlined,
-                      iconColor: AppColors.error,
-                      title: 'Delete Account',
-                      subtitle: 'Permanently remove your account',
-                      titleColor: AppColors.error,
-                      onTap: () => _confirmDeleteAccount(),
-                    ),
-
-                    // ── LEGAL ────────────────────────────────
-                    _SectionHeader('LEGAL'),
-                    _SettingsTile(
-                      icon: Icons.article_outlined,
-                      iconColor: const Color(0xFF6366F1),
-                      title: 'Terms of Service',
-                      onTap: () =>
-                          _showLegal(context, 'Terms of Service', _kTerms),
-                    ),
-                    _SettingsTile(
-                      icon: Icons.privacy_tip_outlined,
-                      iconColor: const Color(0xFF6366F1),
-                      title: 'Privacy Policy',
-                      onTap: () =>
-                          _showLegal(context, 'Privacy Policy', _kPrivacy),
-                    ),
-
-                    // ── ABOUT ────────────────────────────────
-                    _SectionHeader('ABOUT'),
-                    _SettingsTile(
-                      icon: Icons.info_outline_rounded,
-                      iconColor: AppColors.info,
-                      title: 'App Version',
-                      trailing: const Text(
-                        '1.0.0',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textMuted,
-                          fontWeight: FontWeight.w500,
+                    child: ListView(
+                      children: [
+                        // ── APPEARANCE ───────────────────────────
+                        _SectionHeader('APPEARANCE'),
+                        _SettingsTile(
+                          icon: _themeIcon(themeMode),
+                          iconColor: AppColors.blue,
+                          title: 'Theme',
+                          subtitle: _themeName(themeMode),
+                          onTap: () => _showThemePicker(context, themeMode),
                         ),
-                      ),
-                    ),
-                    _SettingsTile(
-                      icon: Icons.star_outline_rounded,
-                      iconColor: AppColors.gold,
-                      title: 'Rate Votera',
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Opening store… (coming soon)'),
+
+                        // ── NOTIFICATIONS ────────────────────────
+                        _SectionHeader('NOTIFICATIONS'),
+                        _SettingsToggleTile(
+                          icon: Icons.notifications_outlined,
+                          iconColor: const Color(0xFFF59E0B),
+                          title: 'Push Notifications',
+                          subtitle: 'Receive alerts for polls and updates',
+                          value: _notificationsEnabled,
+                          onChanged: (val) {
+                            setState(() => _notificationsEnabled = val);
+                            _prefs.notificationsEnabled = val;
+                          },
+                        ),
+
+                        // ── ACCOUNT ──────────────────────────────
+                        _SectionHeader('ACCOUNT'),
+                        _SettingsTile(
+                          icon: Icons.person_outline_rounded,
+                          iconColor: const Color(0xFF10B981),
+                          title: 'Edit Profile',
+                          onTap: () =>
+                              Navigator.pushNamed(context, RouteNames.profile),
+                        ),
+                        _SettingsTile(
+                          icon: Icons.delete_forever_outlined,
+                          iconColor: AppColors.error,
+                          title: 'Delete Account',
+                          subtitle: 'Permanently remove your account',
+                          titleColor: AppColors.error,
+                          onTap: () => _confirmDeleteAccount(),
+                        ),
+
+                        // ── LEGAL ────────────────────────────────
+                        _SectionHeader('LEGAL'),
+                        _SettingsTile(
+                          icon: Icons.article_outlined,
+                          iconColor: const Color(0xFF6366F1),
+                          title: 'Terms of Service',
+                          onTap: () =>
+                              _showLegal(context, 'Terms of Service', _kTerms),
+                        ),
+                        _SettingsTile(
+                          icon: Icons.privacy_tip_outlined,
+                          iconColor: const Color(0xFF6366F1),
+                          title: 'Privacy Policy',
+                          onTap: () =>
+                              _showLegal(context, 'Privacy Policy', _kPrivacy),
+                        ),
+
+                        // ── ABOUT ────────────────────────────────
+                        _SectionHeader('ABOUT'),
+                        _SettingsTile(
+                          icon: Icons.info_outline_rounded,
+                          iconColor: AppColors.info,
+                          title: 'App Version',
+                          trailing: const Text(
+                            '1.0.0',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textMuted,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        );
-                      },
+                        ),
+                        _SettingsTile(
+                          icon: Icons.star_outline_rounded,
+                          iconColor: AppColors.gold,
+                          title: 'Rate Votera',
+                          onTap: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Opening store… (coming soon)'),
+                              ),
+                            );
+                          },
+                        ),
+                        _SettingsTile(
+                          icon: Icons.mail_outline_rounded,
+                          iconColor: AppColors.info,
+                          title: 'Contact Us',
+                          subtitle: 'support@votera.app',
+                          onTap: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Opening email… (coming soon)'),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 32),
+                      ],
                     ),
-                    _SettingsTile(
-                      icon: Icons.mail_outline_rounded,
-                      iconColor: AppColors.info,
-                      title: 'Contact Us',
-                      subtitle: 'support@votera.app',
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Opening email… (coming soon)'),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 32),
-                  ],
+                  ),
                 );
               },
             ),

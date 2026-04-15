@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
 import 'package:votera_app/features/workspace/domain/entities/workspace_entity.dart';
@@ -85,139 +86,149 @@ class _JoinWorkspaceViewState extends State<_JoinWorkspaceView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Join a Workspace')),
-      body: Column(
-        children: [
-          // ── Search bar ─────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-            child: TextField(
-              controller: _searchController,
-              textInputAction: TextInputAction.search,
-              onSubmitted: (_) => _onSearch(context),
-              decoration: InputDecoration(
-                hintText: 'Search by name…',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () => _onClear(context),
-                      )
-                    : null,
-              ),
-            ),
-          ),
-
-          // ── Filter chips ───────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-            child: Row(
-              children: [
-                FilterChip(
-                  label: const Text('Verified only'),
-                  selected: _verifiedOnly,
-                  onSelected: (v) => _toggleVerified(context, v),
-                  avatar: const Icon(Icons.verified_rounded, size: 14),
-                  selectedColor: AppColors.blue.withAlpha(30),
-                  checkmarkColor: AppColors.blue,
-                  labelStyle: TextStyle(
-                    fontSize: 12,
-                    color: _verifiedOnly
-                        ? AppColors.blue
-                        : Theme.of(context).colorScheme.onSurface,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: kWideMaxWidth),
+          child: Column(
+            children: [
+              // ── Search bar ─────────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                child: TextField(
+                  controller: _searchController,
+                  textInputAction: TextInputAction.search,
+                  onSubmitted: (_) => _onSearch(context),
+                  decoration: InputDecoration(
+                    hintText: 'Search by name…',
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () => _onClear(context),
+                          )
+                        : null,
                   ),
                 ),
-              ],
-            ),
-          ),
+              ),
 
-          // ── List ───────────────────────────────────────────
-          Expanded(
-            child: BlocConsumer<WorkspaceCubit, WorkspaceState>(
-              listener: (context, state) {
-                if (state is PublicWorkspacesLoaded) {
-                  setState(() => _publicWorkspaces = state.workspaces);
-                } else if (state is WorkspaceSearchResultsLoaded) {
-                  setState(() => _searchResults = state.results);
-                } else if (state is WorkspaceActionSuccess) {
-                  if (_processing.isNotEmpty) {
-                    final id = _processing.first;
-                    setState(() {
-                      _requested.add(id);
-                      _processing.remove(id);
-                    });
-                  }
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(state.message),
-                      backgroundColor: AppColors.success,
+              // ── Filter chips ───────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                child: Row(
+                  children: [
+                    FilterChip(
+                      label: const Text('Verified only'),
+                      selected: _verifiedOnly,
+                      onSelected: (v) => _toggleVerified(context, v),
+                      avatar: const Icon(Icons.verified_rounded, size: 14),
+                      selectedColor: AppColors.blue.withAlpha(30),
+                      checkmarkColor: AppColors.blue,
+                      labelStyle: TextStyle(
+                        fontSize: 12,
+                        color: _verifiedOnly
+                            ? AppColors.blue
+                            : Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
-                  );
-                } else if (state is WorkspaceError) {
-                  setState(() => _processing.clear());
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(state.message),
-                      backgroundColor: AppColors.error,
-                    ),
-                  );
-                }
-              },
-              builder: (context, state) {
-                final isLoading = state is WorkspaceLoading;
+                  ],
+                ),
+              ),
 
-                if (_isSearchMode) {
-                  // ── Search results ────────────────────────
-                  if (isLoading && _searchResults.isEmpty) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (_searchResults.isEmpty) {
-                    return _EmptyState(hasSearch: true);
-                  }
-                  return ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-                    itemCount: _searchResults.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
-                    itemBuilder: (context, i) {
-                      final ws = _searchResults[i];
-                      return _SearchResultCard(
-                        workspace: ws,
-                        isProcessing: _processing.contains(ws.workspaceId),
-                        isRequested: _requested.contains(ws.workspaceId),
-                        onJoin: () => _requestJoin(context, ws.workspaceId),
+              // ── List ───────────────────────────────────────────
+              Expanded(
+                child: BlocConsumer<WorkspaceCubit, WorkspaceState>(
+                  listener: (context, state) {
+                    if (state is PublicWorkspacesLoaded) {
+                      setState(() => _publicWorkspaces = state.workspaces);
+                    } else if (state is WorkspaceSearchResultsLoaded) {
+                      setState(() => _searchResults = state.results);
+                    } else if (state is WorkspaceActionSuccess) {
+                      if (_processing.isNotEmpty) {
+                        final id = _processing.first;
+                        setState(() {
+                          _requested.add(id);
+                          _processing.remove(id);
+                        });
+                      }
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(state.message),
+                          backgroundColor: AppColors.success,
+                        ),
                       );
-                    },
-                  );
-                } else {
-                  // ── Public workspaces ─────────────────────
-                  if (isLoading && _publicWorkspaces.isEmpty) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (_publicWorkspaces.isEmpty) {
-                    return _EmptyState(hasSearch: false);
-                  }
-                  return RefreshIndicator(
-                    onRefresh: () =>
-                        context.read<WorkspaceCubit>().loadPublicWorkspaces(),
-                    child: ListView.separated(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-                      itemCount: _publicWorkspaces.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
-                      itemBuilder: (context, i) {
-                        final ws = _publicWorkspaces[i];
-                        return _WorkspaceJoinCard(
-                          workspace: ws,
-                          isProcessing: _processing.contains(ws.workspaceId),
-                          isRequested: _requested.contains(ws.workspaceId),
-                          onJoin: () => _requestJoin(context, ws.workspaceId),
-                        );
-                      },
-                    ),
-                  );
-                }
-              },
-            ),
+                    } else if (state is WorkspaceError) {
+                      setState(() => _processing.clear());
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(state.message),
+                          backgroundColor: AppColors.error,
+                        ),
+                      );
+                    }
+                  },
+                  builder: (context, state) {
+                    final isLoading = state is WorkspaceLoading;
+
+                    if (_isSearchMode) {
+                      // ── Search results ────────────────────────
+                      if (isLoading && _searchResults.isEmpty) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (_searchResults.isEmpty) {
+                        return _EmptyState(hasSearch: true);
+                      }
+                      return ListView.separated(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                        itemCount: _searchResults.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        itemBuilder: (context, i) {
+                          final ws = _searchResults[i];
+                          return _SearchResultCard(
+                            workspace: ws,
+                            isProcessing: _processing.contains(ws.workspaceId),
+                            isRequested: _requested.contains(ws.workspaceId),
+                            onJoin: () => _requestJoin(context, ws.workspaceId),
+                          );
+                        },
+                      );
+                    } else {
+                      // ── Public workspaces ─────────────────────
+                      if (isLoading && _publicWorkspaces.isEmpty) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (_publicWorkspaces.isEmpty) {
+                        return _EmptyState(hasSearch: false);
+                      }
+                      return RefreshIndicator(
+                        onRefresh: () => context
+                            .read<WorkspaceCubit>()
+                            .loadPublicWorkspaces(),
+                        child: ListView.separated(
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                          itemCount: _publicWorkspaces.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 10),
+                          itemBuilder: (context, i) {
+                            final ws = _publicWorkspaces[i];
+                            return _WorkspaceJoinCard(
+                              workspace: ws,
+                              isProcessing: _processing.contains(
+                                ws.workspaceId,
+                              ),
+                              isRequested: _requested.contains(ws.workspaceId),
+                              onJoin: () =>
+                                  _requestJoin(context, ws.workspaceId),
+                            );
+                          },
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

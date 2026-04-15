@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_cubit.dart';
@@ -69,137 +70,146 @@ class _InviteMemberViewState extends State<_InviteMemberView> {
       },
       child: Scaffold(
         appBar: AppBar(title: const Text('Invite Member')),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // ── Info banner ───────────────────────────────
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.blue.withAlpha(12),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.blue.withAlpha(40)),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.info_outline_rounded,
-                        color: AppColors.blue,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          'An invite will be sent to the member. They will need to verify and join.',
-                          style: AppTypography.caption.copyWith(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 28),
-                // ── Contact type ─────────────────────────────
-                Text('Contact Type', style: AppTypography.sectionHeading),
-                const SizedBox(height: 10),
-                Row(
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: kContentMaxWidth),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Expanded(
-                      child: _TypeTile(
-                        icon: Icons.phone_outlined,
-                        label: 'Mobile',
-                        selected: _contactType == 'mobile',
-                        onTap: () => setState(() {
-                          _contactType = 'mobile';
-                          _contactCtrl.clear();
-                        }),
+                    // ── Info banner ───────────────────────────────
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.blue.withAlpha(12),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.blue.withAlpha(40)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline_rounded,
+                            color: AppColors.blue,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'An invite will be sent to the member. They will need to verify and join.',
+                              style: AppTypography.caption.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: _TypeTile(
-                        icon: Icons.email_outlined,
-                        label: 'Email',
-                        selected: _contactType == 'email',
-                        onTap: () => setState(() {
-                          _contactType = 'email';
-                          _contactCtrl.clear();
-                        }),
+                    const SizedBox(height: 28),
+                    // ── Contact type ─────────────────────────────
+                    Text('Contact Type', style: AppTypography.sectionHeading),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _TypeTile(
+                            icon: Icons.phone_outlined,
+                            label: 'Mobile',
+                            selected: _contactType == 'mobile',
+                            onTap: () => setState(() {
+                              _contactType = 'mobile';
+                              _contactCtrl.clear();
+                            }),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _TypeTile(
+                            icon: Icons.email_outlined,
+                            label: 'Email',
+                            selected: _contactType == 'email',
+                            onTap: () => setState(() {
+                              _contactType = 'email';
+                              _contactCtrl.clear();
+                            }),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    // ── Contact field ────────────────────────────
+                    Text(
+                      _contactType == 'mobile'
+                          ? 'Mobile Number'
+                          : 'Email Address',
+                      style: AppTypography.sectionHeading,
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _contactCtrl,
+                      keyboardType: _contactType == 'mobile'
+                          ? TextInputType.phone
+                          : TextInputType.emailAddress,
+                      textInputAction: TextInputAction.done,
+                      decoration: InputDecoration(
+                        hintText: _contactType == 'mobile'
+                            ? '+91 9999999999'
+                            : 'member@example.com',
+                        prefixIcon: Icon(
+                          _contactType == 'mobile'
+                              ? Icons.phone_outlined
+                              : Icons.email_outlined,
+                        ),
                       ),
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) {
+                          return 'This field is required';
+                        }
+                        if (_contactType == 'email' && !v.contains('@')) {
+                          return 'Enter a valid email address';
+                        }
+                        if (_contactType == 'mobile' && v.trim().length < 7) {
+                          return 'Enter a valid mobile number';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 36),
+                    // ── Submit ───────────────────────────────────
+                    BlocBuilder<WorkspaceCubit, WorkspaceState>(
+                      builder: (context, state) {
+                        return SizedBox(
+                          height: 52,
+                          child: ElevatedButton.icon(
+                            onPressed: state is WorkspaceLoading
+                                ? null
+                                : _submit,
+                            icon: state is WorkspaceLoading
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Icon(Icons.send_rounded),
+                            label: Text(
+                              state is WorkspaceLoading
+                                  ? 'Sending...'
+                                  : 'Send Invitation',
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
-                // ── Contact field ────────────────────────────
-                Text(
-                  _contactType == 'mobile' ? 'Mobile Number' : 'Email Address',
-                  style: AppTypography.sectionHeading,
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _contactCtrl,
-                  keyboardType: _contactType == 'mobile'
-                      ? TextInputType.phone
-                      : TextInputType.emailAddress,
-                  textInputAction: TextInputAction.done,
-                  decoration: InputDecoration(
-                    hintText: _contactType == 'mobile'
-                        ? '+91 9999999999'
-                        : 'member@example.com',
-                    prefixIcon: Icon(
-                      _contactType == 'mobile'
-                          ? Icons.phone_outlined
-                          : Icons.email_outlined,
-                    ),
-                  ),
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return 'This field is required';
-                    }
-                    if (_contactType == 'email' && !v.contains('@')) {
-                      return 'Enter a valid email address';
-                    }
-                    if (_contactType == 'mobile' && v.trim().length < 7) {
-                      return 'Enter a valid mobile number';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 36),
-                // ── Submit ───────────────────────────────────
-                BlocBuilder<WorkspaceCubit, WorkspaceState>(
-                  builder: (context, state) {
-                    return SizedBox(
-                      height: 52,
-                      child: ElevatedButton.icon(
-                        onPressed: state is WorkspaceLoading ? null : _submit,
-                        icon: state is WorkspaceLoading
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Icon(Icons.send_rounded),
-                        label: Text(
-                          state is WorkspaceLoading
-                              ? 'Sending...'
-                              : 'Send Invitation',
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
+              ),
             ),
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
 import 'package:votera_app/features/workspace/domain/entities/workspace_entity.dart';
@@ -103,24 +104,29 @@ class _WorkspaceInboxViewState extends State<_WorkspaceInboxView> {
           }
           return RefreshIndicator(
             onRefresh: () => context.read<WorkspaceCubit>().loadInvites(),
-            child: ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-              itemCount: _invites.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, i) {
-                final invite = _invites[i];
-                final busy = _processing.contains(invite.workspaceId);
-                return _InviteCard(
-                  invite: invite,
-                  isBusy: busy,
-                  onAccept: busy
-                      ? null
-                      : () => _respond(context, invite.workspaceId, true),
-                  onDecline: busy
-                      ? null
-                      : () => _respond(context, invite.workspaceId, false),
-                );
-              },
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: kContentMaxWidth),
+                child: ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                  itemCount: _invites.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (context, i) {
+                    final invite = _invites[i];
+                    final busy = _processing.contains(invite.workspaceId);
+                    return _InviteCard(
+                      invite: invite,
+                      isBusy: busy,
+                      onAccept: busy
+                          ? null
+                          : () => _respond(context, invite.workspaceId, true),
+                      onDecline: busy
+                          ? null
+                          : () => _respond(context, invite.workspaceId, false),
+                    );
+                  },
+                ),
+              ),
             ),
           );
         },

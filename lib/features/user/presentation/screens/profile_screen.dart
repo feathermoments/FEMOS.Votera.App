@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/features/user/domain/entities/user_profile_entity.dart';
 import 'package:votera_app/features/user/presentation/cubit/user_cubit.dart';
@@ -149,90 +150,95 @@ class _ProfileViewState extends State<_ProfileView> {
             );
           }
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  // ── Avatar ──────────────────────────────────────
-                  _AvatarSection(
-                    profilePictureUrl: _editing
-                        ? _picCtrl.text
-                        : profile.profilePicture,
-                    name: profile.name,
-                    editing: _editing,
-                    picController: _picCtrl,
-                    onPickerTap: () {
-                      if (_editing) _showUrlDialog(context);
-                    },
-                  ),
-                  const SizedBox(height: 32),
-                  // ── Fields ──────────────────────────────────────
-                  _ProfileField(
-                    icon: Icons.person_outline_rounded,
-                    label: 'Full Name',
-                    value: profile.name,
-                    controller: _nameCtrl,
-                    editing: _editing,
-                    validator: (v) => (v == null || v.trim().isEmpty)
-                        ? 'Name required'
-                        : null,
-                  ),
-                  const SizedBox(height: 16),
-                  _ProfileField(
-                    icon: Icons.phone_outlined,
-                    label: 'Mobile',
-                    value: profile.mobile,
-                    controller: _mobileCtrl,
-                    editing: _editing,
-                    keyboardType: TextInputType.phone,
-                  ),
-                  const SizedBox(height: 16),
-                  _ProfileField(
-                    icon: Icons.email_outlined,
-                    label: 'Email',
-                    value: profile.email,
-                    controller: _emailCtrl,
-                    editing: _editing,
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  if (_editing) ...[
-                    const SizedBox(height: 16),
-                    _ProfileField(
-                      icon: Icons.image_outlined,
-                      label: 'Profile Picture URL',
-                      value: profile.profilePicture,
-                      controller: _picCtrl,
-                      editing: true,
-                      keyboardType: TextInputType.url,
-                    ),
-                  ],
-                  if (_editing) ...[
-                    const SizedBox(height: 32),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () => _save(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.blue,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'Save Changes',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 15,
-                          ),
-                        ),
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: kContentMaxWidth),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      // ── Avatar ──────────────────────────────────────
+                      _AvatarSection(
+                        profilePictureUrl: _editing
+                            ? _picCtrl.text
+                            : profile.profilePicture,
+                        name: profile.name,
+                        editing: _editing,
+                        picController: _picCtrl,
+                        onPickerTap: () {
+                          if (_editing) _showUrlDialog(context);
+                        },
                       ),
-                    ),
-                  ],
-                ],
+                      const SizedBox(height: 32),
+                      // ── Fields ──────────────────────────────────────
+                      _ProfileField(
+                        icon: Icons.person_outline_rounded,
+                        label: 'Full Name',
+                        value: profile.name,
+                        controller: _nameCtrl,
+                        editing: _editing,
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? 'Name required'
+                            : null,
+                      ),
+                      const SizedBox(height: 16),
+                      _ProfileField(
+                        icon: Icons.phone_outlined,
+                        label: 'Mobile',
+                        value: profile.mobile,
+                        controller: _mobileCtrl,
+                        editing: _editing,
+                        keyboardType: TextInputType.phone,
+                      ),
+                      const SizedBox(height: 16),
+                      _ProfileField(
+                        icon: Icons.email_outlined,
+                        label: 'Email',
+                        value: profile.email,
+                        controller: _emailCtrl,
+                        editing: _editing,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      if (_editing) ...[
+                        const SizedBox(height: 16),
+                        _ProfileField(
+                          icon: Icons.image_outlined,
+                          label: 'Profile Picture URL',
+                          value: profile.profilePicture,
+                          controller: _picCtrl,
+                          editing: true,
+                          keyboardType: TextInputType.url,
+                        ),
+                      ],
+                      if (_editing) ...[
+                        const SizedBox(height: 32),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () => _save(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.blue,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              'Save Changes',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
               ),
             ),
           );

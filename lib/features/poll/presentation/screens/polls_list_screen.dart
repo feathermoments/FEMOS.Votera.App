@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
@@ -258,14 +259,30 @@ class _PollTab extends StatelessWidget {
         ),
       );
     }
+
+    // On wide screens use a two-column grid; on mobile use a list
     return RefreshIndicator(
       onRefresh: onRefresh,
-      child: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 88),
-        itemCount: polls.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
-        itemBuilder: (context, i) => _PollCard(poll: polls[i], userId: userId),
-      ),
+      child: context.isWide
+          ? GridView.builder(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 88),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: context.isDesktop ? 3 : 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.4,
+              ),
+              itemCount: polls.length,
+              itemBuilder: (context, i) =>
+                  _PollCard(poll: polls[i], userId: userId),
+            )
+          : ListView.separated(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 88),
+              itemCount: polls.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              itemBuilder: (context, i) =>
+                  _PollCard(poll: polls[i], userId: userId),
+            ),
     );
   }
 }
