@@ -20,12 +20,14 @@ abstract final class AppTheme {
         onSurface: AppColors.textPrimary,
         error: AppColors.error,
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: AppColors.whiteSurface,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
-        titleTextStyle: AppTypography.screenTitle,
+        titleTextStyle: AppTypography.screenTitle.copyWith(
+          color: AppColors.textPrimary,
+        ),
       ),
       cardTheme: CardThemeData(
         color: AppColors.whiteCard,
