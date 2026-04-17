@@ -14,7 +14,7 @@ abstract final class ApiRoutes {
   static const userWorkspaces = '/workspace/user';
   static const publicWorkspaces = '/workspace/public';
   static String workspaceById(int id) => '/workspace/$id';
-  static const inviteMember = '/workspace/invite';
+  static const inviteMember = '/workspace/invite-member';
   static const joinWorkspace = '/workspace/join';
   static const workspaceSearch = '/workspace/search';
   static const approveMember = '/workspace/approve-member';
@@ -25,6 +25,8 @@ abstract final class ApiRoutes {
   static const workspaceTypes = '/workspace/workspace-types';
   static const memberInvites = '/workspace/member-invites';
   static const respondInvite = '/workspace/respond-invite';
+  static const createInviteLink = '/workspace/create-invite';
+  static String workspaceInviteLinks(int id) => '/workspace/$id/invites';
 
   // ── Poll ────────────────────────────────────────────────
   static const activePolls = '/poll/active';

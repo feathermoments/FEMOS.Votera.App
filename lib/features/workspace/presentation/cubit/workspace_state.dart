@@ -66,6 +66,18 @@ class WorkspaceInvitesLoaded extends WorkspaceState {
   final List<WorkspaceInviteEntity> invites;
 }
 
+class WorkspaceInviteLinksLoaded extends WorkspaceState {
+  const WorkspaceInviteLinksLoaded(this.links);
+
+  final List<WorkspaceInviteLinkEntity> links;
+}
+
+class WorkspaceInviteLinkCreated extends WorkspaceState {
+  const WorkspaceInviteLinkCreated(this.link);
+
+  final WorkspaceInviteLinkEntity link;
+}
+
 class WorkspaceError extends WorkspaceState {
   const WorkspaceError(this.message);
 

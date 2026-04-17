@@ -55,4 +55,15 @@ abstract interface class IWorkspaceRepository {
     required int userId,
     required bool isAccepted,
   });
+
+  Future<WorkspaceInviteLinkEntity> createInviteLink({
+    required int workspaceId,
+    required String expiryDate,
+    required int maxUsage,
+    required String roleToAssign,
+  });
+
+  Future<List<WorkspaceInviteLinkEntity>> getWorkspaceInviteLinks(
+    int workspaceId,
+  );
 }

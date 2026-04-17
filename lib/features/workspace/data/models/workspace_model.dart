@@ -147,3 +147,32 @@ class WorkspaceSearchResultModel extends WorkspaceSearchResultEntity {
     );
   }
 }
+
+class WorkspaceInviteLinkModel extends WorkspaceInviteLinkEntity {
+  const WorkspaceInviteLinkModel({
+    required super.inviteId,
+    required super.inviteCode,
+    required super.inviteLink,
+    required super.status,
+    required super.usageCount,
+    required super.maxUsage,
+    required super.remainingUsage,
+    required super.expiryDate,
+    required super.totalJoins,
+  });
+
+  factory WorkspaceInviteLinkModel.fromJson(Map<String, dynamic> json) {
+    return WorkspaceInviteLinkModel(
+      inviteId: (json['inviteId'] as num? ?? 0).toInt(),
+      inviteCode: json['inviteCode'] as String? ?? '',
+      inviteLink: json['inviteLink'] as String? ?? '',
+      status: json['status'] as String? ?? '',
+      usageCount: (json['usageCount'] as num? ?? 0).toInt(),
+      maxUsage: (json['maxUsage'] as num? ?? 0).toInt(),
+      remainingUsage: (json['remainingUsage'] as num? ?? 0).toInt(),
+      expiryDate:
+          json['ExpiryDate'] as String? ?? json['expiryDate'] as String? ?? '',
+      totalJoins: (json['totalJoins'] as num? ?? 0).toInt(),
+    );
+  }
+}

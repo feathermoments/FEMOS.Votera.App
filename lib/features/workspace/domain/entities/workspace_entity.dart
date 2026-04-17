@@ -121,3 +121,27 @@ class WorkspaceSearchResultEntity {
   final bool isVerified;
   final int memberCount;
 }
+
+class WorkspaceInviteLinkEntity {
+  const WorkspaceInviteLinkEntity({
+    required this.inviteId,
+    required this.inviteCode,
+    required this.inviteLink,
+    required this.status,
+    required this.usageCount,
+    required this.maxUsage,
+    required this.remainingUsage,
+    required this.expiryDate,
+    required this.totalJoins,
+  });
+
+  final int inviteId;
+  final String inviteCode;
+  final String inviteLink;
+  final String status;
+  final int usageCount;
+  final int maxUsage;
+  final int remainingUsage;
+  final String expiryDate;
+  final int totalJoins;
+}

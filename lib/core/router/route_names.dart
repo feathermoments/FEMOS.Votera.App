@@ -11,6 +11,7 @@ abstract final class RouteNames {
   static const inviteMember = '/workspaces/invite';
   static const workspaceVerification = '/workspaces/verification';
   static const workspaceInbox = '/workspaces/inbox';
+  static const workspaceInviteLinks = '/workspaces/invite-links';
 
   // Poll
   static const polls = '/polls';

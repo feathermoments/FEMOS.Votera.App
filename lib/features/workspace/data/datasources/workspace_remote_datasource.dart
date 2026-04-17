@@ -165,6 +165,33 @@ class WorkspaceRemoteDataSource {
     }
   }
 
+  Future<Map<String, dynamic>> createInviteLink(
+    Map<String, dynamic> body,
+  ) async {
+    try {
+      final data = await _client.post<Map<String, dynamic>>(
+        ApiRoutes.createInviteLink,
+        data: body,
+      );
+      return data ?? {};
+    } on DioException catch (e) {
+      _throw(e);
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getWorkspaceInviteLinks(
+    int workspaceId,
+  ) async {
+    try {
+      final data = await _client.get<List<dynamic>>(
+        ApiRoutes.workspaceInviteLinks(workspaceId),
+      );
+      return (data ?? []).cast<Map<String, dynamic>>();
+    } on DioException catch (e) {
+      _throw(e);
+    }
+  }
+
   Never _throw(DioException e) {
     final msg =
         (e.response?.data as Map?)?['message'] as String? ??

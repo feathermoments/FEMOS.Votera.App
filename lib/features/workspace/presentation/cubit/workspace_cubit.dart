@@ -222,4 +222,34 @@ class WorkspaceCubit extends Cubit<WorkspaceState> {
       emit(WorkspaceError(e.toString()));
     }
   }
+
+  Future<void> loadWorkspaceInviteLinks(int workspaceId) async {
+    emit(const WorkspaceLoading());
+    try {
+      final links = await _repository.getWorkspaceInviteLinks(workspaceId);
+      emit(WorkspaceInviteLinksLoaded(links));
+    } catch (e) {
+      emit(WorkspaceError(e.toString()));
+    }
+  }
+
+  Future<void> createInviteLink({
+    required int workspaceId,
+    required String expiryDate,
+    required int maxUsage,
+    required String roleToAssign,
+  }) async {
+    emit(const WorkspaceLoading());
+    try {
+      final link = await _repository.createInviteLink(
+        workspaceId: workspaceId,
+        expiryDate: expiryDate,
+        maxUsage: maxUsage,
+        roleToAssign: roleToAssign,
+      );
+      emit(WorkspaceInviteLinkCreated(link));
+    } catch (e) {
+      emit(WorkspaceError(e.toString()));
+    }
+  }
 }

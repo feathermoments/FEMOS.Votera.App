@@ -144,4 +144,28 @@ class WorkspaceRepositoryImpl implements IWorkspaceRepository {
       'isAccepted': isAccepted,
     });
   }
+
+  @override
+  Future<WorkspaceInviteLinkEntity> createInviteLink({
+    required int workspaceId,
+    required String expiryDate,
+    required int maxUsage,
+    required String roleToAssign,
+  }) async {
+    final json = await _dataSource.createInviteLink({
+      'workspaceId': workspaceId,
+      'expiryDate': expiryDate,
+      'maxUsage': maxUsage,
+      'roleToAssign': roleToAssign,
+    });
+    return WorkspaceInviteLinkModel.fromJson(json);
+  }
+
+  @override
+  Future<List<WorkspaceInviteLinkEntity>> getWorkspaceInviteLinks(
+    int workspaceId,
+  ) async {
+    final list = await _dataSource.getWorkspaceInviteLinks(workspaceId);
+    return list.map(WorkspaceInviteLinkModel.fromJson).toList();
+  }
 }

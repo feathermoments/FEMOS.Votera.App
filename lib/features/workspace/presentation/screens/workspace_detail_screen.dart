@@ -84,6 +84,21 @@ class _WorkspaceDetailScreenState extends State<WorkspaceDetailScreen>
             appBar: AppBar(
               title: Text(_workspace?.name ?? 'Workspace'),
               actions: [
+                if (_workspace != null &&
+                    (_workspace!.role == 'Admin' ||
+                        _workspace!.role == 'Owner'))
+                  IconButton(
+                    icon: const Icon(Icons.link_rounded),
+                    tooltip: 'Invite Links',
+                    onPressed: () => Navigator.pushNamed(
+                      context,
+                      RouteNames.workspaceInviteLinks,
+                      arguments: {
+                        'workspaceId': widget.workspaceId,
+                        'role': _workspace!.role,
+                      },
+                    ),
+                  ),
                 if (_workspace != null)
                   IconButton(
                     icon: const Icon(Icons.verified_user_outlined),

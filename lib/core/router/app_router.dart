@@ -13,6 +13,7 @@ import 'package:votera_app/features/workspace/presentation/screens/invite_member
 import 'package:votera_app/features/workspace/presentation/screens/join_workspace_screen.dart';
 import 'package:votera_app/features/workspace/presentation/screens/workspace_detail_screen.dart';
 import 'package:votera_app/features/workspace/presentation/screens/workspace_inbox_screen.dart';
+import 'package:votera_app/features/workspace/presentation/screens/workspace_invite_links_screen.dart';
 import 'package:votera_app/features/workspace/presentation/screens/workspace_list_screen.dart';
 import 'package:votera_app/features/notification/presentation/screens/notifications_screen.dart';
 import 'package:votera_app/features/settings/presentation/screens/settings_screen.dart';
@@ -79,6 +80,15 @@ abstract final class AppRouter {
         final id = settings.arguments as int;
         return MaterialPageRoute(
           builder: (_) => WorkspaceVerificationScreen(workspaceId: id),
+          settings: settings,
+        );
+      case RouteNames.workspaceInviteLinks:
+        final args = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (_) => WorkspaceInviteLinksScreen(
+            workspaceId: args['workspaceId'] as int,
+            role: args['role'] as String,
+          ),
           settings: settings,
         );
       case RouteNames.polls:
