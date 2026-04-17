@@ -78,6 +78,12 @@ class WorkspaceInviteLinkCreated extends WorkspaceState {
   final WorkspaceInviteLinkEntity link;
 }
 
+class WorkspaceInviteValidated extends WorkspaceState {
+  const WorkspaceInviteValidated(this.data);
+
+  final WorkspaceInviteValidationEntity data;
+}
+
 class WorkspaceError extends WorkspaceState {
   const WorkspaceError(this.message);
 

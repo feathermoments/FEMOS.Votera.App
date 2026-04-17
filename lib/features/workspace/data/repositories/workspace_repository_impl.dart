@@ -168,4 +168,27 @@ class WorkspaceRepositoryImpl implements IWorkspaceRepository {
     final list = await _dataSource.getWorkspaceInviteLinks(workspaceId);
     return list.map(WorkspaceInviteLinkModel.fromJson).toList();
   }
+
+  @override
+  Future<WorkspaceInviteValidationEntity> validateInvite(
+    String inviteCode,
+  ) async {
+    final json = await _dataSource.validateInvite(inviteCode);
+    return WorkspaceInviteValidationModel.fromJson(json);
+  }
+
+  @override
+  Future<String> joinViaInvite({
+    required String inviteCode,
+    required int roleIdToAssign,
+    // required String userIp,
+    // required String deviceInfo,
+  }) {
+    return _dataSource.joinViaInvite(
+      inviteCode: inviteCode,
+      roleIdToAssign: roleIdToAssign,
+      // userIp: userIp,
+      // deviceInfo: deviceInfo,
+    );
+  }
 }

@@ -122,6 +122,34 @@ class WorkspaceSearchResultEntity {
   final int memberCount;
 }
 
+class WorkspaceInviteValidationEntity {
+  const WorkspaceInviteValidationEntity({
+    required this.isValid,
+    required this.message,
+    required this.inviteId,
+    required this.workspaceId,
+    required this.maxUsage,
+    required this.usageCount,
+    required this.expiryDate,
+    required this.roleToAssign,
+    required this.userId,
+    required this.workspaceName,
+    required this.workspaceLogo,
+  });
+
+  final bool isValid;
+  final String message;
+  final int inviteId;
+  final int workspaceId;
+  final int maxUsage;
+  final int usageCount;
+  final String expiryDate;
+  final String roleToAssign;
+  final int userId;
+  final String workspaceName;
+  final String workspaceLogo;
+}
+
 class WorkspaceInviteLinkEntity {
   const WorkspaceInviteLinkEntity({
     required this.inviteId,

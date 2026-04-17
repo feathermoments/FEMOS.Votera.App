@@ -192,6 +192,40 @@ class WorkspaceRemoteDataSource {
     }
   }
 
+  Future<Map<String, dynamic>> validateInvite(String inviteCode) async {
+    try {
+      final data = await _client.get<Map<String, dynamic>>(
+        ApiRoutes.validateInvite,
+        queryParameters: {'inviteCode': inviteCode},
+      );
+      return data ?? {};
+    } on DioException catch (e) {
+      _throw(e);
+    }
+  }
+
+  Future<String> joinViaInvite({
+    required String inviteCode,
+    required int roleIdToAssign,
+    // required String userIp,
+    // required String deviceInfo,
+  }) async {
+    try {
+      final data = await _client.post<Map<String, dynamic>>(
+        ApiRoutes.joinInvite,
+        data: {
+          'InviteCode': inviteCode,
+          'RoleIdToAssign': roleIdToAssign,
+          // 'UserIP': userIp,
+          // 'DeviceInfo': deviceInfo,
+        },
+      );
+      return data?['message'] as String? ?? 'Joined successfully!';
+    } on DioException catch (e) {
+      _throw(e);
+    }
+  }
+
   Never _throw(DioException e) {
     final msg =
         (e.response?.data as Map?)?['message'] as String? ??

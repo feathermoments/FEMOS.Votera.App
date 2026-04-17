@@ -66,4 +66,13 @@ abstract interface class IWorkspaceRepository {
   Future<List<WorkspaceInviteLinkEntity>> getWorkspaceInviteLinks(
     int workspaceId,
   );
+
+  Future<WorkspaceInviteValidationEntity> validateInvite(String inviteCode);
+
+  Future<String> joinViaInvite({
+    required String inviteCode,
+    required int roleIdToAssign,
+    // required String userIp,
+    // required String deviceInfo,
+  });
 }

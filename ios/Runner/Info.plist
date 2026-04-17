@@ -69,5 +69,26 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+
+	<!-- Custom URL scheme: votera://workspace/join/{code} -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.votera.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>votera</string>
+			</array>
+		</dict>
+	</array>
+
+	<!-- Universal Links (production): https://yourapp.com/workspace/join/{code} -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:yourapp.com</string>
+	</array>
 </dict>
 </plist>

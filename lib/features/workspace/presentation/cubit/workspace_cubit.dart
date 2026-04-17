@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:votera_app/core/di/service_locator.dart';
 import 'package:votera_app/core/storage/secure_storage.dart';
@@ -250,6 +254,50 @@ class WorkspaceCubit extends Cubit<WorkspaceState> {
       emit(WorkspaceInviteLinkCreated(link));
     } catch (e) {
       emit(WorkspaceError(e.toString()));
+    }
+  }
+
+  Future<void> validateInviteCode(String inviteCode) async {
+    emit(const WorkspaceLoading());
+    try {
+      final data = await _repository.validateInvite(inviteCode);
+      emit(WorkspaceInviteValidated(data));
+    } catch (e) {
+      emit(WorkspaceError(e.toString()));
+    }
+  }
+
+  Future<void> joinViaInviteCode(String inviteCode) async {
+    emit(const WorkspaceLoading());
+    try {
+      final deviceInfo = await _collectDeviceInfo();
+      final message = await _repository.joinViaInvite(
+        inviteCode: inviteCode,
+        roleIdToAssign: 3,
+      );
+      emit(WorkspaceActionSuccess(message));
+    } catch (e) {
+      emit(WorkspaceError(e.toString()));
+    }
+  }
+
+  Future<String> _collectDeviceInfo() async {
+    try {
+      final plugin = DeviceInfoPlugin();
+      if (kIsWeb) {
+        final info = await plugin.webBrowserInfo;
+        return info.userAgent ?? 'Web';
+      } else if (Platform.isAndroid) {
+        final info = await plugin.androidInfo;
+        return '${info.manufacturer} ${info.model} (Android ${info.version.release})';
+      } else if (Platform.isIOS) {
+        final info = await plugin.iosInfo;
+        return '${info.name} ${info.systemVersion}';
+      } else {
+        return Platform.operatingSystem;
+      }
+    } catch (_) {
+      return 'Unknown';
     }
   }
 }

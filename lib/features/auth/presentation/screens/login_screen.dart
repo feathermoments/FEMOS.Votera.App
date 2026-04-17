@@ -19,6 +19,19 @@ class _LoginScreenState extends State<LoginScreen> {
   final _identifierCtrl = TextEditingController();
   String _type = 'mobile';
 
+  // Optional post-auth redirect injected via route arguments.
+  String? _nextRoute;
+  Object? _nextArgs;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    _nextRoute = args?['nextRoute'] as String?;
+    _nextArgs = args?['nextArgs'];
+  }
+
   @override
   void dispose() {
     _identifierCtrl.dispose();
@@ -35,7 +48,12 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.pushNamed(
               ctx,
               RouteNames.verifyOtp,
-              arguments: {'identifier': state.identifier, 'type': state.type},
+              arguments: {
+                'identifier': state.identifier,
+                'type': state.type,
+                if (_nextRoute != null) 'nextRoute': _nextRoute,
+                if (_nextArgs != null) 'nextArgs': _nextArgs,
+              },
             );
           } else if (state is AuthError) {
             ScaffoldMessenger.of(ctx).showSnackBar(

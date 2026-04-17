@@ -24,6 +24,8 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
 
   late final String _identifier;
   late final String _type;
+  String? _nextRoute;
+  Object? _nextArgs;
 
   @override
   void didChangeDependencies() {
@@ -32,6 +34,8 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     _identifier = args?['identifier'] as String? ?? '';
     _type = args?['type'] as String? ?? 'mobile';
+    _nextRoute = args?['nextRoute'] as String?;
+    _nextArgs = args?['nextArgs'];
   }
 
   @override
@@ -69,7 +73,15 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (ctx, state) {
         if (state is AuthAuthenticated) {
-          Navigator.pushReplacementNamed(ctx, RouteNames.dashboard);
+          if (_nextRoute != null) {
+            Navigator.pushReplacementNamed(
+              ctx,
+              _nextRoute!,
+              arguments: _nextArgs,
+            );
+          } else {
+            Navigator.pushReplacementNamed(ctx, RouteNames.dashboard);
+          }
         } else if (state is OtpSent) {
           ScaffoldMessenger.of(ctx).showSnackBar(
             const SnackBar(content: Text('OTP resent successfully')),

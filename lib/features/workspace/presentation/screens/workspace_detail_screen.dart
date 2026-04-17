@@ -164,6 +164,9 @@ class _WorkspaceDetailScreenState extends State<WorkspaceDetailScreen>
                         isLoading:
                             state is WorkspaceLoading &&
                             _membersLoaded == false,
+                        isAdmin:
+                            _workspace?.role == 'Admin' ||
+                            _workspace?.role == 'Owner',
                         onApprove: (userId) => _cubit.approveMember(
                           workspaceId: widget.workspaceId,
                           memberUserId: userId,
@@ -547,11 +550,13 @@ class _RequestsTab extends StatelessWidget {
   const _RequestsTab({
     required this.requests,
     required this.isLoading,
+    required this.isAdmin,
     required this.onApprove,
     required this.onReject,
   });
   final List<WorkspaceMemberEntity> requests;
   final bool isLoading;
+  final bool isAdmin;
   final ValueChanged<int> onApprove;
   final ValueChanged<int> onReject;
 
@@ -572,6 +577,7 @@ class _RequestsTab extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 8),
       itemBuilder: (_, i) => _RequestTile(
         member: requests[i],
+        isAdmin: isAdmin,
         onApprove: () => onApprove(requests[i].userId),
         onReject: () => onReject(requests[i].userId),
       ),
@@ -582,10 +588,12 @@ class _RequestsTab extends StatelessWidget {
 class _RequestTile extends StatelessWidget {
   const _RequestTile({
     required this.member,
+    required this.isAdmin,
     required this.onApprove,
     required this.onReject,
   });
   final WorkspaceMemberEntity member;
+  final bool isAdmin;
   final VoidCallback onApprove;
   final VoidCallback onReject;
 
@@ -625,23 +633,25 @@ class _RequestTile extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 8),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _ActionBtn(
-                  icon: Icons.check_rounded,
-                  color: AppColors.success,
-                  onTap: onApprove,
-                ),
-                const SizedBox(width: 8),
-                _ActionBtn(
-                  icon: Icons.close_rounded,
-                  color: AppColors.error,
-                  onTap: onReject,
-                ),
-              ],
-            ),
+            if (isAdmin) ...[
+              const SizedBox(width: 8),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _ActionBtn(
+                    icon: Icons.check_rounded,
+                    color: AppColors.success,
+                    onTap: onApprove,
+                  ),
+                  const SizedBox(width: 8),
+                  _ActionBtn(
+                    icon: Icons.close_rounded,
+                    color: AppColors.error,
+                    onTap: onReject,
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),

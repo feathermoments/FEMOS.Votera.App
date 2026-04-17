@@ -148,6 +148,41 @@ class WorkspaceSearchResultModel extends WorkspaceSearchResultEntity {
   }
 }
 
+class WorkspaceInviteValidationModel extends WorkspaceInviteValidationEntity {
+  const WorkspaceInviteValidationModel({
+    required super.isValid,
+    required super.message,
+    required super.inviteId,
+    required super.workspaceId,
+    required super.maxUsage,
+    required super.usageCount,
+    required super.expiryDate,
+    required super.roleToAssign,
+    required super.userId,
+    required super.workspaceName,
+    required super.workspaceLogo,
+  });
+
+  factory WorkspaceInviteValidationModel.fromJson(Map<String, dynamic> json) {
+    final info =
+        json['objWorkspaceInviteLinkInfo'] as Map<String, dynamic>? ?? json;
+    return WorkspaceInviteValidationModel(
+      isValid: json['isValid'] as bool? ?? false,
+      message: json['message'] as String? ?? '',
+      inviteId: (info['inviteId'] as num? ?? 0).toInt(),
+      workspaceId: (info['workspaceId'] as num? ?? 0).toInt(),
+      maxUsage: (info['maxUsage'] as num? ?? 0).toInt(),
+      usageCount: (info['usageCount'] as num? ?? 0).toInt(),
+      expiryDate:
+          info['expiryDate'] as String? ?? info['ExpiryDate'] as String? ?? '',
+      roleToAssign: info['roleToAssign'] as String? ?? '',
+      userId: (info['userId'] as num? ?? 0).toInt(),
+      workspaceName: info['workspaceName'] as String? ?? '',
+      workspaceLogo: info['workspaceLogo'] as String? ?? '',
+    );
+  }
+}
+
 class WorkspaceInviteLinkModel extends WorkspaceInviteLinkEntity {
   const WorkspaceInviteLinkModel({
     required super.inviteId,
