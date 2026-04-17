@@ -31,6 +31,7 @@ class _AddWorkspaceViewState extends State<_AddWorkspaceView> {
   final _nameCtrl = TextEditingController();
   int? _typeId;
   bool _isPublic = true;
+  bool _autoPublicJoin = false;
   List<WorkspaceTypeEntity> _types = [];
 
   @override
@@ -46,6 +47,7 @@ class _AddWorkspaceViewState extends State<_AddWorkspaceView> {
       name: _nameCtrl.text.trim(),
       workspaceTypeId: _typeId!,
       isPublic: _isPublic,
+      autoPublicJoin: _isPublic ? _autoPublicJoin : false,
     );
   }
 
@@ -77,7 +79,8 @@ class _AddWorkspaceViewState extends State<_AddWorkspaceView> {
       },
       child: Scaffold(
         appBar: AppBar(title: const Text('Create Workspace')),
-        body: Center(
+        body: Align(
+          alignment: Alignment.topCenter,
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: kContentMaxWidth),
             child: SingleChildScrollView(
@@ -210,9 +213,44 @@ class _AddWorkspaceViewState extends State<_AddWorkspaceView> {
                         ),
                         value: _isPublic,
                         activeThumbColor: AppColors.blue,
-                        onChanged: (v) => setState(() => _isPublic = v),
+                        onChanged: (v) => setState(() {
+                          _isPublic = v;
+                          if (!v) _autoPublicJoin = false;
+                        }),
                       ),
                     ),
+                    if (_isPublic) ...[
+                      const SizedBox(height: 12),
+                      Card(
+                        child: SwitchListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 4,
+                          ),
+                          title: Text(
+                            'Auto Public Join',
+                            style: AppTypography.cardTitle,
+                          ),
+                          subtitle: Text(
+                            _autoPublicJoin
+                                ? 'Users are joined automatically without approval'
+                                : 'Users must request to join',
+                            style: AppTypography.caption,
+                          ),
+                          secondary: Icon(
+                            _autoPublicJoin
+                                ? Icons.how_to_reg_rounded
+                                : Icons.pending_actions_rounded,
+                            color: _autoPublicJoin
+                                ? AppColors.success
+                                : AppColors.textMuted,
+                          ),
+                          value: _autoPublicJoin,
+                          activeThumbColor: AppColors.blue,
+                          onChanged: (v) => setState(() => _autoPublicJoin = v),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 36),
                     // ── Submit ───────────────────────────────────
                     BlocBuilder<WorkspaceCubit, WorkspaceState>(

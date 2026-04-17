@@ -108,11 +108,15 @@ class _WorkspaceDetailScreenState extends State<WorkspaceDetailScreen>
                 _workspace != null &&
                     (_workspace!.role == 'Admin' || _workspace!.role == 'Owner')
                 ? FloatingActionButton.extended(
-                    onPressed: () => Navigator.pushNamed(
-                      context,
-                      RouteNames.inviteMember,
-                      arguments: widget.workspaceId,
-                    ),
+                    onPressed: () =>
+                        Navigator.pushNamed(
+                          context,
+                          RouteNames.inviteMember,
+                          arguments: widget.workspaceId,
+                        ).then((_) {
+                          _membersLoaded = false;
+                          _cubit.loadMembers(widget.workspaceId);
+                        }),
                     backgroundColor: AppColors.blue,
                     icon: const Icon(
                       Icons.person_add_outlined,
@@ -607,14 +611,15 @@ class _RequestTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Column(
+            Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 _ActionBtn(
                   icon: Icons.check_rounded,
                   color: AppColors.success,
                   onTap: onApprove,
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(width: 8),
                 _ActionBtn(
                   icon: Icons.close_rounded,
                   color: AppColors.error,

@@ -13,11 +13,13 @@ class WorkspaceRepositoryImpl implements IWorkspaceRepository {
     required String name,
     required int workspaceTypeId,
     required bool isPublic,
+    required bool autoPublicJoin,
   }) {
     return _dataSource.createWorkspace({
       'name': name,
       'workspaceTypeId': workspaceTypeId,
       'isPublic': isPublic,
+      'autoPublicJoin': autoPublicJoin,
     });
   }
 

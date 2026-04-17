@@ -35,6 +35,7 @@ class WorkspaceCubit extends Cubit<WorkspaceState> {
     required String name,
     required int workspaceTypeId,
     required bool isPublic,
+    required bool autoPublicJoin,
   }) async {
     emit(const WorkspaceLoading());
     try {
@@ -42,6 +43,7 @@ class WorkspaceCubit extends Cubit<WorkspaceState> {
         name: name,
         workspaceTypeId: workspaceTypeId,
         isPublic: isPublic,
+        autoPublicJoin: autoPublicJoin,
       );
       emit(const WorkspaceActionSuccess('Workspace created successfully'));
     } catch (e) {

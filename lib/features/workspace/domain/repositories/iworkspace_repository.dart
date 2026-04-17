@@ -5,6 +5,7 @@ abstract interface class IWorkspaceRepository {
     required String name,
     required int workspaceTypeId,
     required bool isPublic,
+    required bool autoPublicJoin,
   });
 
   Future<List<WorkspaceEntity>> getUserWorkspaces();
