@@ -18,6 +18,9 @@ class LocalStorageService {
       _prefs.get('themeMode', defaultValue: 'system') as String;
   set themeMode(String mode) => _prefs.put('themeMode', mode);
 
+  String get locale => _prefs.get('locale', defaultValue: 'en') as String;
+  set locale(String code) => _prefs.put('locale', code);
+
   bool get notificationsEnabled =>
       _prefs.get('notificationsEnabled', defaultValue: true) as bool;
   set notificationsEnabled(bool value) =>

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:votera_app/core/di/service_locator.dart';
+import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/storage/secure_storage.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
@@ -197,7 +198,7 @@ class _InviteDetailView extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.whiteSurface,
       appBar: AppBar(
-        title: const Text('Join Workspace'),
+        title: Text(AppLocalizations.of(context).workspaceJoinInviteTitle),
         leading: IconButton(
           icon: const Icon(Icons.close_rounded),
           onPressed: onClose,
@@ -234,7 +235,9 @@ class _InviteDetailView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        'You\'ve been invited as  ${data.roleToAssign}',
+                        AppLocalizations.of(
+                          context,
+                        ).workspaceInvitedAsRole(data.roleToAssign),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: AppColors.blue,
                           fontWeight: FontWeight.w600,
@@ -277,7 +280,9 @@ class _InviteDetailView extends StatelessWidget {
                     _Divider(),
                     _InfoRow(
                       icon: Icons.calendar_today_rounded,
-                      label: 'Expires',
+                      label: AppLocalizations.of(
+                        context,
+                      ).workspaceInviteExpiresLabel,
                       value: _formatDate(data.expiryDate),
                       valueColor: _isExpired(data.expiryDate)
                           ? AppColors.error
@@ -286,7 +291,9 @@ class _InviteDetailView extends StatelessWidget {
                     _Divider(),
                     _InfoRow(
                       icon: Icons.group_rounded,
-                      label: 'Usage',
+                      label: AppLocalizations.of(
+                        context,
+                      ).workspaceInviteUsageLabel,
                       value: '${data.usageCount} / ${data.maxUsage}',
                       trailing: _UsageBar(
                         used: data.usageCount,
@@ -359,8 +366,12 @@ class _InviteDetailView extends StatelessWidget {
                             )
                           : Text(
                               data.isValid
-                                  ? 'Join Workspace'
-                                  : 'Send Request To Join',
+                                  ? AppLocalizations.of(
+                                      ctx,
+                                    ).workspaceInviteJoinButton
+                                  : AppLocalizations.of(
+                                      ctx,
+                                    ).workspaceInviteSendRequestButton,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
@@ -385,9 +396,12 @@ class _InviteDetailView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
-                    'Close',
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                  child: Text(
+                    AppLocalizations.of(context).workspaceInviteCloseButton,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
@@ -559,7 +573,7 @@ class _ErrorView extends StatelessWidget {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Join Workspace'),
+        title: Text(AppLocalizations.of(context).workspaceInviteErrorTitle),
         leading: IconButton(
           icon: const Icon(Icons.close_rounded),
           onPressed: onClose,
@@ -578,7 +592,7 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'Invalid Invite Link',
+              AppLocalizations.of(context).workspaceInviteErrorHeading,
               textAlign: TextAlign.center,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
@@ -594,9 +608,19 @@ class _ErrorView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 32),
-            OutlinedButton(onPressed: onRetry, child: const Text('Try Again')),
+            OutlinedButton(
+              onPressed: onRetry,
+              child: Text(
+                AppLocalizations.of(context).workspaceInviteRetryButton,
+              ),
+            ),
             const SizedBox(height: 12),
-            TextButton(onPressed: onClose, child: const Text('Close')),
+            TextButton(
+              onPressed: onClose,
+              child: Text(
+                AppLocalizations.of(context).workspaceInviteCloseButton,
+              ),
+            ),
           ],
         ),
       ),

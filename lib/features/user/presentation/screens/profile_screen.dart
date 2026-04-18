@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/features/user/domain/entities/user_profile_entity.dart';
@@ -64,7 +65,7 @@ class _ProfileViewState extends State<_ProfileView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: Text(AppLocalizations.of(context).profileScreenTitle),
         actions: [
           BlocBuilder<UserCubit, UserState>(
             builder: (context, state) {
@@ -87,7 +88,7 @@ class _ProfileViewState extends State<_ProfileView> {
                     if (profile != null) _populate(profile);
                     setState(() => _editing = true);
                   },
-                  child: const Text('Edit'),
+                  child: Text(AppLocalizations.of(context).profileEditButton),
                 );
               }
               return Row(
@@ -95,11 +96,13 @@ class _ProfileViewState extends State<_ProfileView> {
                 children: [
                   TextButton(
                     onPressed: () => setState(() => _editing = false),
-                    child: const Text('Cancel'),
+                    child: Text(
+                      AppLocalizations.of(context).profileCancelButton,
+                    ),
                   ),
                   TextButton(
                     onPressed: () => _save(context),
-                    child: const Text('Save'),
+                    child: Text(AppLocalizations.of(context).profileSaveButton),
                   ),
                 ],
               );
@@ -112,7 +115,11 @@ class _ProfileViewState extends State<_ProfileView> {
           if (state is UserUpdated) {
             setState(() => _editing = false);
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Profile updated successfully')),
+              SnackBar(
+                content: Text(
+                  AppLocalizations.of(context).profileUpdatedSnackbar,
+                ),
+              ),
             );
           }
           if (state is UserError) {
@@ -142,7 +149,9 @@ class _ProfileViewState extends State<_ProfileView> {
                         ElevatedButton(
                           onPressed: () =>
                               context.read<UserCubit>().loadProfile(),
-                          child: const Text('Retry'),
+                          child: Text(
+                            AppLocalizations.of(context).profileRetryButton,
+                          ),
                         ),
                       ],
                     )
@@ -175,18 +184,22 @@ class _ProfileViewState extends State<_ProfileView> {
                       // ── Fields ──────────────────────────────────────
                       _ProfileField(
                         icon: Icons.person_outline_rounded,
-                        label: 'Full Name',
+                        label: AppLocalizations.of(
+                          context,
+                        ).profileFieldFullName,
                         value: profile.name,
                         controller: _nameCtrl,
                         editing: _editing,
                         validator: (v) => (v == null || v.trim().isEmpty)
-                            ? 'Name required'
+                            ? AppLocalizations.of(
+                                context,
+                              ).profileFieldNameRequired
                             : null,
                       ),
                       const SizedBox(height: 16),
                       _ProfileField(
                         icon: Icons.phone_outlined,
-                        label: 'Mobile',
+                        label: AppLocalizations.of(context).profileFieldMobile,
                         value: profile.mobile,
                         controller: _mobileCtrl,
                         editing: _editing,
@@ -195,7 +208,7 @@ class _ProfileViewState extends State<_ProfileView> {
                       const SizedBox(height: 16),
                       _ProfileField(
                         icon: Icons.email_outlined,
-                        label: 'Email',
+                        label: AppLocalizations.of(context).profileFieldEmail,
                         value: profile.email,
                         controller: _emailCtrl,
                         editing: _editing,
@@ -205,7 +218,9 @@ class _ProfileViewState extends State<_ProfileView> {
                         const SizedBox(height: 16),
                         _ProfileField(
                           icon: Icons.image_outlined,
-                          label: 'Profile Picture URL',
+                          label: AppLocalizations.of(
+                            context,
+                          ).profileFieldPictureUrl,
                           value: profile.profilePicture,
                           controller: _picCtrl,
                           editing: true,
@@ -226,9 +241,11 @@ class _ProfileViewState extends State<_ProfileView> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: const Text(
-                              'Save Changes',
-                              style: TextStyle(
+                            child: Text(
+                              AppLocalizations.of(
+                                context,
+                              ).profileSaveChangesButton,
+                              style: const TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 15,
                               ),
@@ -248,29 +265,28 @@ class _ProfileViewState extends State<_ProfileView> {
   }
 
   void _showUrlDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final ctrl = TextEditingController(text: _picCtrl.text);
     showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Profile Picture URL'),
+        title: Text(l10n.profilePictureUrlDialogTitle),
         content: TextField(
           controller: ctrl,
-          decoration: const InputDecoration(
-            hintText: 'https://example.com/photo.jpg',
-          ),
+          decoration: InputDecoration(hintText: l10n.profilePictureUrlHint),
           keyboardType: TextInputType.url,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.profilePictureUrlCancelButton),
           ),
           TextButton(
             onPressed: () {
               setState(() => _picCtrl.text = ctrl.text.trim());
               Navigator.pop(context);
             },
-            child: const Text('Apply'),
+            child: Text(l10n.profilePictureUrlApplyButton),
           ),
         ],
       ),

@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
@@ -91,7 +92,9 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
           }
         } else if (state is OtpSent) {
           ScaffoldMessenger.of(ctx).showSnackBar(
-            const SnackBar(content: Text('OTP resent successfully')),
+            SnackBar(
+              content: Text(AppLocalizations.of(ctx).verifyOtpResendSuccess),
+            ),
           );
         } else if (state is AuthError) {
           ScaffoldMessenger.of(ctx).showSnackBar(
@@ -106,7 +109,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
         final isLoading = state is AuthLoading;
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Verify OTP'),
+            title: Text(AppLocalizations.of(ctx).verifyOtpScreenTitle),
             leading: BackButton(onPressed: () => Navigator.pop(ctx)),
           ),
           body: SafeArea(
@@ -126,7 +129,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        'Enter the 6-digit OTP',
+                        AppLocalizations.of(context).verifyOtpHeading,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
@@ -134,7 +137,9 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Sent to $_identifier',
+                        AppLocalizations.of(
+                          context,
+                        ).verifyOtpSentTo(_identifier),
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: AppColors.textMuted,
@@ -192,7 +197,9 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                                     color: Colors.white,
                                   ),
                                 )
-                              : const Text('Verify OTP'),
+                              : Text(
+                                  AppLocalizations.of(context).verifyOtpButton,
+                                ),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -200,9 +207,9 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                       Center(
                         child: TextButton(
                           onPressed: isLoading ? null : () => _resend(ctx),
-                          child: const Text(
-                            "Didn't receive? Resend OTP",
-                            style: TextStyle(color: AppColors.blue),
+                          child: Text(
+                            AppLocalizations.of(context).verifyOtpResendButton,
+                            style: const TextStyle(color: AppColors.blue),
                           ),
                         ),
                       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
@@ -89,15 +90,17 @@ class _AddPollFormState extends State<_AddPollForm> {
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
     if (_workspaceId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a workspace')),
-      );
+      final l10n = AppLocalizations.of(context);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.addPollNoWorkspaceSnackbar)));
       return;
     }
     if (_categoryId == null) {
+      final l10n = AppLocalizations.of(context);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Please select a category')));
+      ).showSnackBar(SnackBar(content: Text(l10n.addPollNoCategorySnackbar)));
       return;
     }
 
@@ -132,14 +135,18 @@ class _AddPollFormState extends State<_AddPollForm> {
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: const EdgeInsets.symmetric(vertical: 24),
-          child: const Column(
+          child: Column(
             children: [
-              Icon(Icons.workspaces_rounded, size: 44, color: Colors.white),
-              SizedBox(height: 10),
+              const Icon(
+                Icons.workspaces_rounded,
+                size: 44,
+                color: Colors.white,
+              ),
+              const SizedBox(height: 10),
               Text(
-                'No Workspace Found',
+                AppLocalizations.of(context).addPollNoWorkspaceDialogTitle,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -148,12 +155,12 @@ class _AddPollFormState extends State<_AddPollForm> {
             ],
           ),
         ),
-        content: const Padding(
-          padding: EdgeInsets.only(top: 20),
+        content: Padding(
+          padding: const EdgeInsets.only(top: 20),
           child: Text(
-            'You need to create a workspace before adding a poll. Would you like to add one now?',
+            AppLocalizations.of(context).addPollNoWorkspaceDialogBody,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.textSecondary,
               fontSize: 14,
               height: 1.5,
@@ -176,9 +183,9 @@ class _AddPollFormState extends State<_AddPollForm> {
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                  child: Text(
+                    AppLocalizations.of(context).addPollNoWorkspaceDialogCancel,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -204,9 +211,11 @@ class _AddPollFormState extends State<_AddPollForm> {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    'Add Workspace',
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                  child: Text(
+                    AppLocalizations.of(
+                      context,
+                    ).addPollNoWorkspaceDialogAddWorkspace,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -220,7 +229,9 @@ class _AddPollFormState extends State<_AddPollForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Create Poll')),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context).addPollScreenTitle),
+      ),
       body: BlocListener<WorkspaceCubit, WorkspaceState>(
         listener: (context, state) {
           if (state is WorkspaceListLoaded) {
@@ -257,20 +268,28 @@ class _AddPollFormState extends State<_AddPollForm> {
                     padding: const EdgeInsets.all(20),
                     children: [
                       // ── Question ────────────────────────────────────────
-                      _FieldLabel('Question'),
+                      _FieldLabel(
+                        AppLocalizations.of(context).addPollFieldLabelQuestion,
+                      ),
                       const SizedBox(height: 6),
                       TextFormField(
                         controller: _questionCtrl,
                         maxLines: 3,
-                        decoration: _inputDecoration('Enter your question...'),
+                        decoration: _inputDecoration(
+                          AppLocalizations.of(context).addPollQuestionHint,
+                        ),
                         validator: (v) => (v == null || v.trim().isEmpty)
-                            ? 'Question is required'
+                            ? AppLocalizations.of(
+                                context,
+                              ).addPollQuestionRequired
                             : null,
                       ),
                       const SizedBox(height: 18),
 
                       // ── Workspace ───────────────────────────────────────
-                      _FieldLabel('Workspace'),
+                      _FieldLabel(
+                        AppLocalizations.of(context).addPollFieldLabelWorkspace,
+                      ),
                       const SizedBox(height: 6),
                       BlocBuilder<WorkspaceCubit, WorkspaceState>(
                         builder: (context, state) {
@@ -283,7 +302,9 @@ class _AddPollFormState extends State<_AddPollForm> {
                               : <WorkspaceEntity>[];
                           return DropdownButtonFormField<int>(
                             initialValue: _workspaceId,
-                            decoration: _inputDecoration('Select workspace'),
+                            decoration: _inputDecoration(
+                              AppLocalizations.of(context).addPollWorkspaceHint,
+                            ),
                             items: workspaces
                                 .map(
                                   (w) => DropdownMenuItem(
@@ -307,7 +328,9 @@ class _AddPollFormState extends State<_AddPollForm> {
                       const SizedBox(height: 18),
 
                       // ── Category ────────────────────────────────────────
-                      _FieldLabel('Category'),
+                      _FieldLabel(
+                        AppLocalizations.of(context).addPollFieldLabelCategory,
+                      ),
                       const SizedBox(height: 6),
                       BlocBuilder<CategoryCubit, CategoryState>(
                         builder: (context, state) {
@@ -316,7 +339,9 @@ class _AddPollFormState extends State<_AddPollForm> {
                               : <CategoryEntity>[];
                           return DropdownButtonFormField<int>(
                             initialValue: _categoryId,
-                            decoration: _inputDecoration('Select category'),
+                            decoration: _inputDecoration(
+                              AppLocalizations.of(context).addPollCategoryHint,
+                            ),
                             items: cats
                                 .map(
                                   (c) => DropdownMenuItem(
@@ -332,11 +357,17 @@ class _AddPollFormState extends State<_AddPollForm> {
                       const SizedBox(height: 18),
 
                       // ── Visibility ──────────────────────────────────────
-                      _FieldLabel('Visibility'),
+                      _FieldLabel(
+                        AppLocalizations.of(
+                          context,
+                        ).addPollFieldLabelVisibility,
+                      ),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<String>(
                         initialValue: _visibility,
-                        decoration: _inputDecoration('Select visibility'),
+                        decoration: _inputDecoration(
+                          AppLocalizations.of(context).addPollVisibilityHint,
+                        ),
                         items: _visibilityOptions
                             .map(
                               (v) => DropdownMenuItem(
@@ -353,7 +384,11 @@ class _AddPollFormState extends State<_AddPollForm> {
                       // ── Options ─────────────────────────────────────────
                       Row(
                         children: [
-                          _FieldLabel('Options'),
+                          _FieldLabel(
+                            AppLocalizations.of(
+                              context,
+                            ).addPollFieldLabelOptions,
+                          ),
                           const Spacer(),
                           Text(
                             '${_optionCtrls.length}/$_maxOptions',
@@ -371,11 +406,15 @@ class _AddPollFormState extends State<_AddPollForm> {
                                 child: TextFormField(
                                   controller: _optionCtrls[i],
                                   decoration: _inputDecoration(
-                                    'Option ${i + 1}',
+                                    AppLocalizations.of(
+                                      context,
+                                    ).addPollOptionHint(i + 1),
                                   ),
                                   validator: (v) =>
                                       (v == null || v.trim().isEmpty)
-                                      ? 'Option cannot be empty'
+                                      ? AppLocalizations.of(
+                                          context,
+                                        ).addPollOptionRequired
                                       : null,
                                 ),
                               ),
@@ -403,7 +442,11 @@ class _AddPollFormState extends State<_AddPollForm> {
                               Icons.add_circle_outline,
                               size: 18,
                             ),
-                            label: const Text('Add Option'),
+                            label: Text(
+                              AppLocalizations.of(
+                                context,
+                              ).addPollAddOptionButton,
+                            ),
                             style: TextButton.styleFrom(
                               foregroundColor: AppColors.blue,
                               padding: EdgeInsets.zero,
@@ -423,11 +466,15 @@ class _AddPollFormState extends State<_AddPollForm> {
                         ),
                         child: SwitchListTile(
                           title: Text(
-                            'Anonymous Voting',
+                            AppLocalizations.of(
+                              context,
+                            ).addPollAnonymousVotingTitle,
                             style: AppTypography.bodySmall,
                           ),
                           subtitle: Text(
-                            'Voters\' identities will be hidden',
+                            AppLocalizations.of(
+                              context,
+                            ).addPollAnonymousVotingSubtitle,
                             style: AppTypography.captionSmall,
                           ),
                           value: _isAnonymous,
@@ -438,20 +485,28 @@ class _AddPollFormState extends State<_AddPollForm> {
                       const SizedBox(height: 18),
 
                       // ── Expiry Date ─────────────────────────────────────
-                      _FieldLabel('Expiry Date (optional)'),
+                      _FieldLabel(
+                        AppLocalizations.of(
+                          context,
+                        ).addPollFieldLabelExpiryDate,
+                      ),
                       const SizedBox(height: 6),
                       InkWell(
                         onTap: _pickExpiry,
                         borderRadius: BorderRadius.circular(10),
                         child: InputDecorator(
-                          decoration: _inputDecoration('Tap to pick a date'),
+                          decoration: _inputDecoration(
+                            AppLocalizations.of(context).addPollExpiryDateHint,
+                          ),
                           child: Row(
                             children: [
                               Expanded(
                                 child: Text(
                                   _expiryDate != null
                                       ? '${_expiryDate!.day}/${_expiryDate!.month}/${_expiryDate!.year}'
-                                      : 'No expiry (open-ended)',
+                                      : AppLocalizations.of(
+                                          context,
+                                        ).addPollNoExpiry,
                                   style: _expiryDate != null
                                       ? AppTypography.bodySmall
                                       : AppTypography.captionSmall,
@@ -503,9 +558,11 @@ class _AddPollFormState extends State<_AddPollForm> {
                                     strokeWidth: 2,
                                   ),
                                 )
-                              : const Text(
-                                  'Create Poll',
-                                  style: TextStyle(
+                              : Text(
+                                  AppLocalizations.of(
+                                    context,
+                                  ).addPollSubmitButton,
+                                  style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
                                   ),

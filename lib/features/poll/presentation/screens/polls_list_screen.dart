@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
@@ -75,7 +76,7 @@ class _PollsListViewState extends State<_PollsListView>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Polls'),
+        title: Text(AppLocalizations.of(context).pollsListTitle),
         bottom: TabBar(
           controller: _tabs,
           tabs: const [

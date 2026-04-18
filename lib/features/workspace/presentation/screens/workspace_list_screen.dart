@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
@@ -27,7 +28,7 @@ class _WorkspaceListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Workspaces'),
+        title: Text(AppLocalizations.of(context).workspaceListTitle),
         actions: [
           IconButton(
             tooltip: 'Join a workspace',
@@ -147,7 +148,9 @@ class _EmptyState extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onAdd,
               icon: const Icon(Icons.add),
-              label: const Text('Create Workspace'),
+              label: Text(
+                AppLocalizations.of(context).workspaceListCreateButton,
+              ),
             ),
           ],
         ),

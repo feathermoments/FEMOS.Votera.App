@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
@@ -141,35 +142,43 @@ class _WideLayout extends StatelessWidget {
         Expanded(
           child: Container(
             decoration: const BoxDecoration(gradient: AppColors.blueGradient),
-            child: const Center(
-              child: Padding(
-                padding: EdgeInsets.all(40),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.how_to_vote_rounded,
-                      color: Colors.white,
-                      size: 80,
+            child: Builder(
+              builder: (context) {
+                final l10n = AppLocalizations.of(context);
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(40),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.how_to_vote_rounded,
+                          color: Colors.white,
+                          size: 80,
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          l10n.appName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 40,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -1,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          l10n.appTagline,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 24),
-                    Text(
-                      'Votera',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 40,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -1,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      'Every Voice Matters',
-                      style: TextStyle(color: Colors.white70, fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             ),
           ),
         ),
@@ -227,6 +236,7 @@ class _FormBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: SingleChildScrollView(
         padding: hideBranding
@@ -265,7 +275,7 @@ class _FormBody extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    'Votera',
+                    l10n.appName,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.w800,
@@ -274,7 +284,7 @@ class _FormBody extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Every Voice Matters',
+                    l10n.appTagline,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.textMuted,
@@ -283,14 +293,14 @@ class _FormBody extends StatelessWidget {
                 ],
                 if (hideBranding) ...[
                   Text(
-                    'Sign In',
+                    l10n.loginSignIn,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Enter your mobile or email to continue',
+                    l10n.loginSubtitle,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.textMuted,
                     ),
@@ -302,7 +312,7 @@ class _FormBody extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _TypeChip(
-                        label: 'Email',
+                        label: l10n.loginTypeEmail,
                         selected: type == 'email',
                         onTap: () => onTypeChanged('email'),
                       ),
@@ -310,7 +320,7 @@ class _FormBody extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _TypeChip(
-                        label: 'Mobile',
+                        label: l10n.loginTypeMobile,
                         selected: type == 'mobile',
                         onTap: () => onTypeChanged('mobile'),
                       ),
@@ -333,10 +343,12 @@ class _FormBody extends StatelessWidget {
                         ]
                       : null,
                   decoration: InputDecoration(
-                    labelText: type == 'mobile' ? 'Mobile Number' : 'Email',
+                    labelText: type == 'mobile'
+                        ? l10n.loginLabelMobileNumber
+                        : l10n.loginLabelEmail,
                     hintText: type == 'mobile'
-                        ? '10-digit mobile number'
-                        : 'you@example.com',
+                        ? l10n.loginHintMobileNumber
+                        : l10n.loginHintEmail,
                     prefixIcon: Icon(
                       type == 'mobile'
                           ? Icons.phone_outlined
@@ -347,21 +359,21 @@ class _FormBody extends StatelessWidget {
                     final val = v?.trim() ?? '';
                     if (val.isEmpty) {
                       return type == 'mobile'
-                          ? 'Mobile number is required'
-                          : 'Email is required';
+                          ? l10n.loginValidationMobileRequired
+                          : l10n.loginValidationEmailRequired;
                     }
                     if (type == 'mobile') {
                       if (val.length != 10) {
-                        return 'Mobile number must be exactly 10 digits';
+                        return l10n.loginValidationMobileLength;
                       }
                       if (!RegExp(r'^[0-9]{10}$').hasMatch(val)) {
-                        return 'Enter a valid 10-digit mobile number';
+                        return l10n.loginValidationMobileInvalid;
                       }
                     } else {
                       if (!RegExp(
                         r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$',
                       ).hasMatch(val)) {
-                        return 'Enter a valid email address';
+                        return l10n.loginValidationEmailInvalid;
                       }
                     }
                     return null;
@@ -382,7 +394,7 @@ class _FormBody extends StatelessWidget {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Send OTP'),
+                        : Text(l10n.loginSendOtpButton),
                   ),
                 ),
                 const SizedBox(height: 48),

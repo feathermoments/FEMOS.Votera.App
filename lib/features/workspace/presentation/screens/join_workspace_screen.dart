@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
@@ -76,7 +77,9 @@ class _JoinWorkspaceViewState extends State<_JoinWorkspaceView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Join a Workspace')),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context).joinWorkspaceTitle),
+      ),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: kWideMaxWidth),
@@ -90,7 +93,9 @@ class _JoinWorkspaceViewState extends State<_JoinWorkspaceView> {
                   textInputAction: TextInputAction.search,
                   onSubmitted: (_) => _onSearch(context),
                   decoration: InputDecoration(
-                    hintText: 'Search by name…',
+                    hintText: AppLocalizations.of(
+                      context,
+                    ).joinWorkspaceSearchHint,
                     prefixIcon: const Icon(Icons.search),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
@@ -108,7 +113,11 @@ class _JoinWorkspaceViewState extends State<_JoinWorkspaceView> {
                 child: Row(
                   children: [
                     FilterChip(
-                      label: const Text('Verified only'),
+                      label: Text(
+                        AppLocalizations.of(
+                          context,
+                        ).joinWorkspaceFilterVerifiedOnly,
+                      ),
                       selected: _verifiedOnly,
                       onSelected: (v) => _toggleVerified(context, v),
                       avatar: const Icon(Icons.verified_rounded, size: 14),
@@ -214,14 +223,18 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              hasSearch ? 'No workspaces found' : 'No public workspaces',
+              hasSearch
+                  ? AppLocalizations.of(context).joinWorkspaceEmptySearchTitle
+                  : AppLocalizations.of(context).joinWorkspaceEmptyDefaultTitle,
               style: AppTypography.sectionHeading,
             ),
             const SizedBox(height: 6),
             Text(
               hasSearch
-                  ? 'Try a different search term'
-                  : 'There are no public workspaces available to join right now',
+                  ? AppLocalizations.of(context).joinWorkspaceEmptySearchCaption
+                  : AppLocalizations.of(
+                      context,
+                    ).joinWorkspaceEmptyDefaultCaption,
               style: AppTypography.caption,
               textAlign: TextAlign.center,
             ),
@@ -322,7 +335,9 @@ class _SearchResultCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${workspace.memberCount} members',
+                        AppLocalizations.of(
+                          context,
+                        ).joinWorkspaceMemberCount(workspace.memberCount),
                         style: AppTypography.caption.copyWith(
                           color: cs.onSurfaceVariant,
                         ),
@@ -461,7 +476,9 @@ class _WorkspaceJoinCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${workspace.memberCount} members',
+                        AppLocalizations.of(
+                          context,
+                        ).joinWorkspaceMemberCount(workspace.memberCount),
                         style: AppTypography.caption.copyWith(
                           color: cs.onSurfaceVariant,
                         ),
@@ -474,7 +491,9 @@ class _WorkspaceJoinCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${workspace.pollCount} polls',
+                        AppLocalizations.of(
+                          context,
+                        ).joinWorkspacePollCount(workspace.pollCount),
                         style: AppTypography.caption.copyWith(
                           color: cs.onSurfaceVariant,
                         ),
@@ -521,7 +540,7 @@ class _JoinButton extends StatelessWidget {
     }
     if (isRequested) {
       return Chip(
-        label: const Text('Requested'),
+        label: Text(AppLocalizations.of(context).joinWorkspaceRequestedChip),
         labelStyle: TextStyle(
           fontSize: 11,
           color: AppColors.success,
@@ -541,7 +560,7 @@ class _JoinButton extends StatelessWidget {
         minimumSize: Size.zero,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
-      child: const Text('Join'),
+      child: Text(AppLocalizations.of(context).joinWorkspaceJoinButton),
     );
   }
 }

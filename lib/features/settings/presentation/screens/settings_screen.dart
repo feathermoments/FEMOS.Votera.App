@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:votera_app/core/di/service_locator.dart';
+import 'package:votera_app/core/l10n/app_localizations.dart';
+import 'package:votera_app/core/l10n/locale_cubit.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/storage/local_storage.dart';
@@ -31,10 +33,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   // ── Helpers ────────────────────────────────────────────────
 
-  String _themeName(ThemeMode mode) => switch (mode) {
-    ThemeMode.light => 'Light',
-    ThemeMode.dark => 'Dark',
-    ThemeMode.system => 'System default',
+  String _themeName(ThemeMode mode, AppLocalizations l10n) => switch (mode) {
+    ThemeMode.light => l10n.settingsThemeLight,
+    ThemeMode.dark => l10n.settingsThemeDark,
+    ThemeMode.system => l10n.settingsThemeSystem,
   };
 
   IconData _themeIcon(ThemeMode mode) => switch (mode) {
@@ -52,6 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (sheetCtx) {
+        final l10n = AppLocalizations.of(sheetCtx);
         return Padding(
           padding: const EdgeInsets.fromLTRB(0, 12, 0, 24),
           child: Column(
@@ -66,12 +69,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Choose Theme',
+                    l10n.settingsChooseThemeTitle,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                   ),
                 ),
@@ -82,11 +85,74 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: mode,
                   groupValue: current,
                   activeColor: AppColors.blue,
-                  title: Text(_themeName(mode)),
+                  title: Text(_themeName(mode, l10n)),
                   secondary: Icon(_themeIcon(mode)),
                   onChanged: (selected) {
                     if (selected != null) {
                       context.read<ThemeCubit>().setMode(selected);
+                    }
+                    Navigator.pop(sheetCtx);
+                  },
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // ── Language picker ────────────────────────────────────────
+
+  String _localeName(Locale locale, AppLocalizations l10n) =>
+      locale.languageCode == 'hi'
+      ? l10n.settingsLanguageHindi
+      : l10n.settingsLanguageEnglish;
+
+  void _showLanguagePicker(BuildContext context, Locale current) {
+    showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetCtx) {
+        final l10n = AppLocalizations.of(sheetCtx);
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(0, 12, 0, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.metallicBorder,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    l10n.settingsChooseLanguageTitle,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              for (final locale in const [Locale('en'), Locale('hi')])
+                RadioListTile<Locale>(
+                  value: locale,
+                  groupValue: current,
+                  activeColor: AppColors.blue,
+                  title: Text(_localeName(locale, l10n)),
+                  onChanged: (selected) {
+                    if (selected != null) {
+                      context.read<LocaleCubit>().setLocale(selected);
                     }
                     Navigator.pop(sheetCtx);
                   },
@@ -103,24 +169,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _confirmDeleteAccount() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: const Text(
-          'This will permanently delete your account and all associated data. '
-          'This action cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+      builder: (ctx) {
+        final l10n = AppLocalizations.of(ctx);
+        return AlertDialog(
+          title: Text(l10n.settingsDeleteAccountDialogTitle),
+          content: Text(l10n.settingsDeleteAccountDialogBody),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(l10n.settingsDeleteAccountDialogCancel),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(foregroundColor: AppColors.error),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(l10n.settingsDeleteAccountDialogConfirm),
+            ),
+          ],
+        );
+      },
     );
 
     if (confirmed != true || !mounted) return;
@@ -133,16 +199,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await showDialog<void>(
         context: context,
         barrierDismissible: false,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Account Deleted'),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
+        builder: (ctx) {
+          final l10n = AppLocalizations.of(ctx);
+          return AlertDialog(
+            title: Text(l10n.settingsAccountDeletedDialogTitle),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(l10n.settingsAccountDeletedOk),
+              ),
+            ],
+          );
+        },
       );
       if (!mounted) return;
       await _prefs.clearCache();
@@ -182,7 +251,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(AppLocalizations.of(context).settingsLegalDialogClose),
           ),
         ],
       ),
@@ -194,11 +263,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context).settingsScreenTitle),
+      ),
       body: _deletingAccount
           ? const Center(child: CircularProgressIndicator())
           : BlocBuilder<ThemeCubit, ThemeMode>(
               builder: (context, themeMode) {
+                final l10n = AppLocalizations.of(context);
+                final locale = context.watch<LocaleCubit>().state;
                 return Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(
@@ -207,22 +280,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: ListView(
                       children: [
                         // ── APPEARANCE ───────────────────────────
-                        _SectionHeader('APPEARANCE'),
+                        _SectionHeader(l10n.settingsSectionAppearance),
                         _SettingsTile(
                           icon: _themeIcon(themeMode),
                           iconColor: AppColors.blue,
-                          title: 'Theme',
-                          subtitle: _themeName(themeMode),
+                          title: l10n.settingsThemeTileTitle,
+                          subtitle: _themeName(themeMode, l10n),
                           onTap: () => _showThemePicker(context, themeMode),
+                        ),
+                        _SettingsTile(
+                          icon: Icons.language_outlined,
+                          iconColor: AppColors.blue,
+                          title: l10n.settingsLanguageTileTitle,
+                          subtitle: _localeName(locale, l10n),
+                          onTap: () => _showLanguagePicker(context, locale),
                         ),
 
                         // ── NOTIFICATIONS ────────────────────────
-                        _SectionHeader('NOTIFICATIONS'),
+                        _SectionHeader(l10n.settingsSectionNotifications),
                         _SettingsToggleTile(
                           icon: Icons.notifications_outlined,
                           iconColor: const Color(0xFFF59E0B),
-                          title: 'Push Notifications',
-                          subtitle: 'Receive alerts for polls and updates',
+                          title: l10n.settingsPushNotificationsTitle,
+                          subtitle: l10n.settingsPushNotificationsSubtitle,
                           value: _notificationsEnabled,
                           onChanged: (val) {
                             setState(() => _notificationsEnabled = val);
@@ -231,49 +311,55 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
 
                         // ── ACCOUNT ──────────────────────────────
-                        _SectionHeader('ACCOUNT'),
+                        _SectionHeader(l10n.settingsSectionAccount),
                         _SettingsTile(
                           icon: Icons.person_outline_rounded,
                           iconColor: const Color(0xFF10B981),
-                          title: 'Edit Profile',
+                          title: l10n.settingsEditProfileTitle,
                           onTap: () =>
                               Navigator.pushNamed(context, RouteNames.profile),
                         ),
                         _SettingsTile(
                           icon: Icons.delete_forever_outlined,
                           iconColor: AppColors.error,
-                          title: 'Delete Account',
-                          subtitle: 'Permanently remove your account',
+                          title: l10n.settingsDeleteAccountTileTitle,
+                          subtitle: l10n.settingsDeleteAccountTileSubtitle,
                           titleColor: AppColors.error,
                           onTap: () => _confirmDeleteAccount(),
                         ),
 
                         // ── LEGAL ────────────────────────────────
-                        _SectionHeader('LEGAL'),
+                        _SectionHeader(l10n.settingsSectionLegal),
                         _SettingsTile(
                           icon: Icons.article_outlined,
                           iconColor: const Color(0xFF6366F1),
-                          title: 'Terms of Service',
-                          onTap: () =>
-                              _showLegal(context, 'Terms of Service', _kTerms),
+                          title: l10n.settingsTermsOfServiceTitle,
+                          onTap: () => _showLegal(
+                            context,
+                            l10n.settingsTermsOfServiceTitle,
+                            _kTerms,
+                          ),
                         ),
                         _SettingsTile(
                           icon: Icons.privacy_tip_outlined,
                           iconColor: const Color(0xFF6366F1),
-                          title: 'Privacy Policy',
-                          onTap: () =>
-                              _showLegal(context, 'Privacy Policy', _kPrivacy),
+                          title: l10n.settingsPrivacyPolicyTitle,
+                          onTap: () => _showLegal(
+                            context,
+                            l10n.settingsPrivacyPolicyTitle,
+                            _kPrivacy,
+                          ),
                         ),
 
                         // ── ABOUT ────────────────────────────────
-                        _SectionHeader('ABOUT'),
+                        _SectionHeader(l10n.settingsSectionAbout),
                         _SettingsTile(
                           icon: Icons.info_outline_rounded,
                           iconColor: AppColors.info,
-                          title: 'App Version',
-                          trailing: const Text(
-                            '1.0.0',
-                            style: TextStyle(
+                          title: l10n.settingsAppVersionTitle,
+                          trailing: Text(
+                            l10n.settingsAppVersionValue,
+                            style: const TextStyle(
                               fontSize: 13,
                               color: AppColors.textMuted,
                               fontWeight: FontWeight.w500,
@@ -283,11 +369,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         _SettingsTile(
                           icon: Icons.star_outline_rounded,
                           iconColor: AppColors.gold,
-                          title: 'Rate Votera',
+                          title: l10n.settingsRateVoteraTitle,
                           onTap: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Opening store… (coming soon)'),
+                              SnackBar(
+                                content: Text(l10n.settingsRateVoteraSnackbar),
                               ),
                             );
                           },
@@ -295,12 +381,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         _SettingsTile(
                           icon: Icons.mail_outline_rounded,
                           iconColor: AppColors.info,
-                          title: 'Contact Us',
-                          subtitle: 'support@votera.app',
+                          title: l10n.settingsContactUsTitle,
+                          subtitle: l10n.settingsContactUsSubtitle,
                           onTap: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Opening email… (coming soon)'),
+                              SnackBar(
+                                content: Text(l10n.settingsContactUsSnackbar),
                               ),
                             );
                           },

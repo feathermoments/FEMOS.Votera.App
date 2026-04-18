@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
@@ -69,7 +70,9 @@ class _InviteMemberViewState extends State<_InviteMemberView> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Invite Member')),
+        appBar: AppBar(
+          title: Text(AppLocalizations.of(context).inviteMemberTitle),
+        ),
         body: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: kContentMaxWidth),

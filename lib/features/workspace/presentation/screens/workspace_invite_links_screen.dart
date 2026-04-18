@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
 import 'package:votera_app/features/workspace/domain/entities/workspace_entity.dart';
@@ -23,7 +24,9 @@ class WorkspaceInviteLinksScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!_isAdmin) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Invite Links')),
+        appBar: AppBar(
+          title: Text(AppLocalizations.of(context).workspaceInviteLinksTitle),
+        ),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(32),
@@ -122,7 +125,9 @@ class _InviteLinksViewState extends State<_InviteLinksView> {
       },
       builder: (context, state) {
         return Scaffold(
-          appBar: AppBar(title: const Text('Invite Links')),
+          appBar: AppBar(
+            title: Text(AppLocalizations.of(context).workspaceInviteLinksTitle),
+          ),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: _showCreateSheet,
             backgroundColor: AppColors.blue,
@@ -212,7 +217,9 @@ class _EmptyState extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onCreateTap,
               icon: const Icon(Icons.add_link_rounded),
-              label: const Text('Create Invite Link'),
+              label: Text(
+                AppLocalizations.of(context).workspaceInviteLinksCreateButton,
+              ),
             ),
           ],
         ),
@@ -333,7 +340,9 @@ class _InviteLinkCard extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: () => _copyLink(context),
                     icon: const Icon(Icons.copy_rounded, size: 16),
-                    label: const Text('Copy'),
+                    label: Text(
+                      AppLocalizations.of(context).workspaceInviteLinksCopy,
+                    ),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                     ),
@@ -344,7 +353,9 @@ class _InviteLinkCard extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: isActive ? () => _shareLink(context) : null,
                     icon: const Icon(Icons.share_rounded, size: 16),
-                    label: const Text('Share'),
+                    label: Text(
+                      AppLocalizations.of(context).workspaceInviteLinksShare,
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.blue,
                       foregroundColor: Colors.white,

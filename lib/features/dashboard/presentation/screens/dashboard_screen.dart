@@ -3,8 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:votera_app/core/config/app_config.dart';
+import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
+import 'package:votera_app/features/auth/presentation/block/auth_bloc.dart';
+import 'package:votera_app/features/auth/presentation/block/auth_event.dart';
 import 'package:votera_app/features/dashboard/presentation/cubit/dashboard_cubit.dart';
 import 'package:votera_app/features/dashboard/presentation/cubit/dashboard_state.dart';
 import 'package:votera_app/core/router/route_names.dart';
@@ -113,15 +116,21 @@ class _DashboardViewState extends State<_DashboardView> {
   }
 
   Widget _buildScaffold(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isWide = context.isWide;
 
     // On wide screens, show a permanent NavigationRail sidebar instead of a drawer
     if (isWide) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Dashboard'),
+          title: Text(l10n.dashboardTitle),
           automaticallyImplyLeading: false,
           actions: [_NotificationButton()],
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () => Navigator.pushNamed(context, RouteNames.addPoll),
+          icon: const Icon(Icons.add_rounded),
+          label: Text(l10n.addPollScreenTitle),
         ),
         body: Row(
           children: [
@@ -144,12 +153,68 @@ class _DashboardViewState extends State<_DashboardView> {
                 } else if (i == 2) {
                   Navigator.pushNamed(context, RouteNames.workspaces);
                 } else if (i == 3) {
-                  Navigator.pushNamed(context, RouteNames.profile);
+                  final userState = context.read<UserCubit>().state;
+                  final userId = userState is UserProfileLoaded
+                      ? userState.profile.userId
+                      : 0;
+                  Navigator.pushNamed(
+                    context,
+                    RouteNames.workspaceInbox,
+                    arguments: userId,
+                  );
                 } else if (i == 4) {
+                  Navigator.pushNamed(context, RouteNames.notifications);
+                } else if (i == 5) {
+                  Navigator.pushNamed(context, RouteNames.profile);
+                } else if (i == 6) {
                   Navigator.pushNamed(context, RouteNames.settings);
                 }
               },
               extended: context.isDesktop,
+              trailing: Expanded(
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: context.isDesktop
+                        ? TextButton.icon(
+                            onPressed: () {
+                              context.read<AuthBloc>().add(
+                                const LogoutRequested(),
+                              );
+                              Navigator.pushReplacementNamed(
+                                context,
+                                RouteNames.login,
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.logout_rounded,
+                              color: AppColors.error,
+                            ),
+                            label: Text(
+                              AppLocalizations.of(context).drawerLogOut,
+                              style: const TextStyle(color: AppColors.error),
+                            ),
+                          )
+                        : IconButton(
+                            tooltip: AppLocalizations.of(context).drawerLogOut,
+                            onPressed: () {
+                              context.read<AuthBloc>().add(
+                                const LogoutRequested(),
+                              );
+                              Navigator.pushReplacementNamed(
+                                context,
+                                RouteNames.login,
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.logout_rounded,
+                              color: AppColors.error,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
               leading: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Container(
@@ -165,31 +230,41 @@ class _DashboardViewState extends State<_DashboardView> {
                   ),
                 ),
               ),
-              destinations: const [
+              destinations: [
                 NavigationRailDestination(
-                  icon: Icon(Icons.dashboard_outlined),
-                  selectedIcon: Icon(Icons.dashboard_rounded),
-                  label: Text('Dashboard'),
+                  icon: const Icon(Icons.dashboard_outlined),
+                  selectedIcon: const Icon(Icons.dashboard_rounded),
+                  label: Text(l10n.dashboardNavDashboard),
                 ),
                 NavigationRailDestination(
-                  icon: Icon(Icons.bar_chart_outlined),
-                  selectedIcon: Icon(Icons.bar_chart_rounded),
-                  label: Text('My Polls'),
+                  icon: const Icon(Icons.bar_chart_outlined),
+                  selectedIcon: const Icon(Icons.bar_chart_rounded),
+                  label: Text(l10n.dashboardNavMyPolls),
                 ),
                 NavigationRailDestination(
-                  icon: Icon(Icons.workspaces_outlined),
-                  selectedIcon: Icon(Icons.workspaces_rounded),
-                  label: Text('Workspaces'),
+                  icon: const Icon(Icons.workspaces_outlined),
+                  selectedIcon: const Icon(Icons.workspaces_rounded),
+                  label: Text(l10n.dashboardNavWorkspaces),
                 ),
                 NavigationRailDestination(
-                  icon: Icon(Icons.person_outline_rounded),
-                  selectedIcon: Icon(Icons.person_rounded),
-                  label: Text('Profile'),
+                  icon: const Icon(Icons.mark_email_unread_outlined),
+                  selectedIcon: const Icon(Icons.mark_email_unread_rounded),
+                  label: Text(l10n.drawerMenuInbox),
                 ),
                 NavigationRailDestination(
-                  icon: Icon(Icons.settings_outlined),
-                  selectedIcon: Icon(Icons.settings_rounded),
-                  label: Text('Settings'),
+                  icon: const Icon(Icons.notifications_outlined),
+                  selectedIcon: const Icon(Icons.notifications_rounded),
+                  label: Text(l10n.drawerMenuNotifications),
+                ),
+                NavigationRailDestination(
+                  icon: const Icon(Icons.person_outline_rounded),
+                  selectedIcon: const Icon(Icons.person_rounded),
+                  label: Text(l10n.dashboardNavProfile),
+                ),
+                NavigationRailDestination(
+                  icon: const Icon(Icons.settings_outlined),
+                  selectedIcon: const Icon(Icons.settings_rounded),
+                  label: Text(l10n.dashboardNavSettings),
                 ),
               ],
             ),
@@ -208,7 +283,7 @@ class _DashboardViewState extends State<_DashboardView> {
         onTabSelected: (i) => setState(() => _currentTab = i),
       ),
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: Text(l10n.dashboardTitle),
         leading: Builder(
           builder: (ctx) => IconButton(
             icon: const Icon(Icons.menu_rounded),
@@ -216,6 +291,11 @@ class _DashboardViewState extends State<_DashboardView> {
           ),
         ),
         actions: [_NotificationButton()],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.pushNamed(context, RouteNames.addPoll),
+        tooltip: l10n.addPollScreenTitle,
+        child: const Icon(Icons.add_rounded),
       ),
       body: _DashboardContent(),
     );
@@ -327,21 +407,25 @@ class _DashboardContent extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 14),
-                          const Column(
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Welcome back!',
-                                style: TextStyle(
+                                AppLocalizations.of(
+                                  context,
+                                ).dashboardWelcomeBack,
+                                style: const TextStyle(
                                   color: Colors.white70,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              SizedBox(height: 2),
+                              const SizedBox(height: 2),
                               Text(
-                                'Votera Dashboard',
-                                style: TextStyle(
+                                AppLocalizations.of(
+                                  context,
+                                ).dashboardVoteraSubtitle,
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
@@ -359,7 +443,9 @@ class _DashboardContent extends StatelessWidget {
                         Expanded(
                           child: _StatCard(
                             icon: Icons.poll_outlined,
-                            label: 'Active Polls',
+                            label: AppLocalizations.of(
+                              context,
+                            ).dashboardStatActivePolls,
                             value: '${stats.activePolls}',
                             color: AppColors.blue,
                           ),
@@ -368,7 +454,9 @@ class _DashboardContent extends StatelessWidget {
                         Expanded(
                           child: _StatCard(
                             icon: Icons.check_circle_outline_rounded,
-                            label: 'Votes Cast',
+                            label: AppLocalizations.of(
+                              context,
+                            ).dashboardStatVotesCast,
                             value: '${stats.votesCast}',
                             color: AppColors.success,
                           ),
@@ -377,7 +465,9 @@ class _DashboardContent extends StatelessWidget {
                         Expanded(
                           child: _StatCard(
                             icon: Icons.people_outline_rounded,
-                            label: 'Voters',
+                            label: AppLocalizations.of(
+                              context,
+                            ).dashboardStatVoters,
                             value: '${stats.voters}',
                             color: AppColors.info,
                           ),
@@ -386,7 +476,7 @@ class _DashboardContent extends StatelessWidget {
                     ),
                     const SizedBox(height: 28),
                     Text(
-                      'Active Polls',
+                      AppLocalizations.of(context).dashboardActivePollsSection,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -398,7 +488,7 @@ class _DashboardContent extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 32),
                           child: Text(
-                            'No active polls right now.',
+                            AppLocalizations.of(context).dashboardNoActivePolls,
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(color: AppColors.textMuted),
                           ),
@@ -526,7 +616,9 @@ class _PollCard extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          '$votes votes · $daysLeft day${daysLeft == 1 ? '' : 's'} left',
+                          AppLocalizations.of(
+                            context,
+                          ).dashboardPollVotesDaysLeft(votes, daysLeft),
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(color: AppColors.textMuted),
                         ),
@@ -556,7 +648,13 @@ class _PollCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                isVoted ? 'Voted' : 'Not Voted',
+                                isVoted
+                                    ? AppLocalizations.of(
+                                        context,
+                                      ).dashboardPollStatusVoted
+                                    : AppLocalizations.of(
+                                        context,
+                                      ).dashboardPollStatusNotVoted,
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
@@ -614,7 +712,9 @@ class _WelcomeOverlay extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 Text(
-                  'Welcome to ${AppConfig.appName}',
+                  AppLocalizations.of(
+                    context,
+                  ).dashboardWelcomeOverlayTitle(AppConfig.appName),
                   textAlign: TextAlign.center,
                   style: theme.textTheme.headlineMedium?.copyWith(
                     color: Colors.white,
@@ -623,7 +723,7 @@ class _WelcomeOverlay extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  AppConfig.tagline,
+                  AppLocalizations.of(context).appTagline,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: Colors.white70,
@@ -642,9 +742,9 @@ class _WelcomeOverlay extends StatelessWidget {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: const Text(
-                      'Get Started',
-                      style: TextStyle(
+                    child: Text(
+                      AppLocalizations.of(context).dashboardGetStartedButton,
+                      style: const TextStyle(
                         fontWeight: FontWeight.w700,
                         fontSize: 16,
                       ),
@@ -698,7 +798,7 @@ class _ProfileCompleteSheet extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Complete Your Profile',
+            AppLocalizations.of(context).dashboardCompleteProfileTitle,
             textAlign: TextAlign.center,
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w700,
@@ -707,7 +807,7 @@ class _ProfileCompleteSheet extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Please complete your profile to get the best experience.',
+            AppLocalizations.of(context).dashboardCompleteProfileBody,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textSecondary,
@@ -725,18 +825,21 @@ class _ProfileCompleteSheet extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              child: const Text(
-                'Complete Profile',
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+              child: Text(
+                AppLocalizations.of(context).dashboardCompleteProfileButton,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
               ),
             ),
           ),
           const SizedBox(height: 12),
           TextButton(
             onPressed: onSkip,
-            child: const Text(
-              'Skip for now',
-              style: TextStyle(color: AppColors.textSecondary),
+            child: Text(
+              AppLocalizations.of(context).dashboardCompleteProfileSkip,
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
           ),
         ],

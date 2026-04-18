@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/l10n/app_localizations.dart';
 
 import '../cubit/poll_cubit.dart';
 
@@ -22,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Polls')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context).pollsHomeTitle)),
       body: BlocBuilder<PollCubit, PollState>(
         builder: (context, state) {
           if (state is PollLoading) {

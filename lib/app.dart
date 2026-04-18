@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:app_links/app_links.dart';
 import 'package:votera_app/core/di/service_locator.dart';
+import 'package:votera_app/core/l10n/app_localizations.dart';
+import 'package:votera_app/core/l10n/locale_cubit.dart';
 import 'package:votera_app/core/router/app_router.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/storage/local_storage.dart';
@@ -22,16 +25,35 @@ class VoteraApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => AuthBloc()..add(const AppStarted())),
         BlocProvider(create: (_) => ThemeCubit(sl<LocalStorageService>())),
+        BlocProvider(create: (_) => LocaleCubit(sl<LocalStorageService>())),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
-        builder: (context, themeMode) => MaterialApp(
-          title: 'Votera',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
-          themeMode: themeMode,
-          onGenerateRoute: AppRouter.onGenerateRoute,
-          home: const _AuthGate(),
+        builder: (context, themeMode) => BlocBuilder<LocaleCubit, Locale>(
+          builder: (context, locale) => MaterialApp(
+            onGenerateTitle: (context) => AppLocalizations.of(context).appName,
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.light,
+            darkTheme: AppTheme.dark,
+            themeMode: themeMode,
+            locale: locale,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en'), Locale('hi')],
+            localeResolutionCallback: (locale, supportedLocales) {
+              for (final supported in supportedLocales) {
+                if (locale?.languageCode == supported.languageCode) {
+                  return supported;
+                }
+              }
+              return const Locale('en');
+            },
+            onGenerateRoute: AppRouter.onGenerateRoute,
+            home: const _AuthGate(),
+          ),
         ),
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
@@ -45,7 +46,9 @@ class _WorkspaceInboxViewState extends State<_WorkspaceInboxView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Workspace Inbox')),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context).workspaceInboxTitle),
+      ),
       body: BlocConsumer<WorkspaceCubit, WorkspaceState>(
         listener: (context, state) {
           if (state is WorkspaceInvitesLoaded) {

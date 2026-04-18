@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
@@ -134,18 +135,20 @@ class AppDrawer extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _Section(
-                      title: 'POLLS',
-                      items: const [
+                      title: AppLocalizations.of(context).drawerSectionPolls,
+                      items: [
                         _MenuItem(
                           icon: Icons.how_to_vote_rounded,
-                          label: 'Dashboard',
+                          label: AppLocalizations.of(
+                            context,
+                          ).drawerMenuDashboard,
                           color: AppColors.blue,
                           tabIndex: 0,
                         ),
                         _MenuItem(
                           icon: Icons.bar_chart_rounded,
-                          label: 'My Polls',
-                          color: Color(0xFF6366F1),
+                          label: AppLocalizations.of(context).drawerMenuMyPolls,
+                          color: const Color(0xFF6366F1),
                           route: RouteNames.polls,
                         ),
                       ],
@@ -164,18 +167,22 @@ class AppDrawer extends StatelessWidget {
                       },
                     ),
                     _Section(
-                      title: 'WORKSPACES',
-                      items: const [
+                      title: AppLocalizations.of(
+                        context,
+                      ).drawerSectionWorkspaces,
+                      items: [
                         _MenuItem(
                           icon: Icons.workspaces_rounded,
-                          label: 'My Workspaces',
-                          color: Color(0xFF0EA5E9),
+                          label: AppLocalizations.of(
+                            context,
+                          ).drawerMenuMyWorkspaces,
+                          color: const Color(0xFF0EA5E9),
                           route: RouteNames.workspaces,
                         ),
                         _MenuItem(
                           icon: Icons.mark_email_unread_outlined,
-                          label: 'Inbox',
-                          color: Color(0xFFF59E0B),
+                          label: AppLocalizations.of(context).drawerMenuInbox,
+                          color: const Color(0xFFF59E0B),
                           route: RouteNames.workspaceInbox,
                         ),
                       ],
@@ -199,23 +206,27 @@ class AppDrawer extends StatelessWidget {
                       },
                     ),
                     _Section(
-                      title: 'ACCOUNT',
-                      items: const [
+                      title: AppLocalizations.of(context).drawerSectionAccount,
+                      items: [
                         _MenuItem(
                           icon: Icons.notifications_outlined,
-                          label: 'Notifications',
-                          color: Color(0xFFEF4444),
+                          label: AppLocalizations.of(
+                            context,
+                          ).drawerMenuNotifications,
+                          color: const Color(0xFFEF4444),
                           route: RouteNames.notifications,
                         ),
                         _MenuItem(
                           icon: Icons.person_outline_rounded,
-                          label: 'Profile',
-                          color: Color(0xFF10B981),
+                          label: AppLocalizations.of(context).drawerMenuProfile,
+                          color: const Color(0xFF10B981),
                           route: RouteNames.profile,
                         ),
                         _MenuItem(
                           icon: Icons.settings_outlined,
-                          label: 'Settings',
+                          label: AppLocalizations.of(
+                            context,
+                          ).drawerMenuSettings,
                           color: AppColors.textSecondary,
                           route: RouteNames.settings,
                         ),
@@ -274,7 +285,7 @@ class AppDrawer extends StatelessWidget {
                         ),
                         const SizedBox(width: 14),
                         Text(
-                          'Log Out',
+                          AppLocalizations.of(context).drawerLogOut,
                           style: AppTypography.cardTitle.copyWith(
                             color: AppColors.error,
                             fontWeight: FontWeight.w700,
