@@ -1,11 +1,11 @@
 {
-    "name": "votera_app",
-    "short_name": "votera_app",
+    "name": "Votera",
+    "short_name": "Votera",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Votera – Every Voice Matters.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
