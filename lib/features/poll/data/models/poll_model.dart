@@ -59,6 +59,8 @@ class PollDetailModel extends PollDetailEntity {
     required super.question,
     required super.isAnonymous,
     required super.options,
+    super.title,
+    super.description,
     super.workspaceName,
     super.votes,
   });
@@ -73,6 +75,8 @@ class PollDetailModel extends PollDetailEntity {
     return PollDetailModel(
       pollId: (json['pollId'] as num).toInt(),
       question: json['question'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String? ?? '',
       isAnonymous: json['isAnonymous'] as bool? ?? true,
       options: opts,
       workspaceName: json['workspaceName'] as String? ?? '',

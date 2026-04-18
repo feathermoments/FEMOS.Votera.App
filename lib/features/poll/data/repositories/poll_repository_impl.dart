@@ -27,6 +27,8 @@ class PollRepositoryImpl implements PollRepository {
     required String question,
     required List<String> options,
     required String visibility,
+    String? title,
+    String? description,
     String? expiryDate,
     bool isAnonymous = true,
   }) {
@@ -38,6 +40,9 @@ class PollRepositoryImpl implements PollRepository {
       'visibility': visibility,
       'isAnonymous': isAnonymous,
     };
+    if (title != null && title.isNotEmpty) body['title'] = title;
+    if (description != null && description.isNotEmpty)
+      body['description'] = description;
     if (expiryDate != null) body['expiryDate'] = expiryDate;
     return remote.createPoll(body);
   }

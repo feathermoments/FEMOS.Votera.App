@@ -37,6 +37,8 @@ class _AddPollForm extends StatefulWidget {
 
 class _AddPollFormState extends State<_AddPollForm> {
   final _formKey = GlobalKey<FormState>();
+  final _titleCtrl = TextEditingController();
+  final _descriptionCtrl = TextEditingController();
   final _questionCtrl = TextEditingController();
   final List<TextEditingController> _optionCtrls = [
     TextEditingController(),
@@ -54,6 +56,8 @@ class _AddPollFormState extends State<_AddPollForm> {
 
   @override
   void dispose() {
+    _titleCtrl.dispose();
+    _descriptionCtrl.dispose();
     _questionCtrl.dispose();
     for (final c in _optionCtrls) {
       c.dispose();
@@ -112,6 +116,8 @@ class _AddPollFormState extends State<_AddPollForm> {
     context.read<PollCubit>().createPoll(
       workspaceId: _workspaceId!,
       categoryId: _categoryId!,
+      title: _titleCtrl.text.trim(),
+      description: _descriptionCtrl.text.trim(),
       question: _questionCtrl.text.trim(),
       options: options,
       visibility: _visibility,
@@ -267,6 +273,38 @@ class _AddPollFormState extends State<_AddPollForm> {
                   child: ListView(
                     padding: const EdgeInsets.all(20),
                     children: [
+                      // ── Title ──────────────────────────────────────
+                      _FieldLabel(
+                        AppLocalizations.of(context).addPollFieldLabelTitle,
+                      ),
+                      const SizedBox(height: 6),
+                      TextFormField(
+                        controller: _titleCtrl,
+                        decoration: _inputDecoration(
+                          AppLocalizations.of(context).addPollTitleHint,
+                        ),
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? AppLocalizations.of(context).addPollTitleRequired
+                            : null,
+                      ),
+                      const SizedBox(height: 18),
+
+                      // ── Description ───────────────────────────────
+                      _FieldLabel(
+                        AppLocalizations.of(
+                          context,
+                        ).addPollFieldLabelDescription,
+                      ),
+                      const SizedBox(height: 6),
+                      TextFormField(
+                        controller: _descriptionCtrl,
+                        maxLines: 3,
+                        decoration: _inputDecoration(
+                          AppLocalizations.of(context).addPollDescriptionHint,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+
                       // ── Question ────────────────────────────────────────
                       _FieldLabel(
                         AppLocalizations.of(context).addPollFieldLabelQuestion,

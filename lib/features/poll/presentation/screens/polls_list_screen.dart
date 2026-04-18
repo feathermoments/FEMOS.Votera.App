@@ -309,11 +309,16 @@ class _PollCard extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () => Navigator.pushNamed(
-          context,
-          RouteNames.pollDetail,
-          arguments: {'pollId': poll.pollId, 'userId': userId},
-        ),
+        onTap: () =>
+            Navigator.pushNamed(
+              context,
+              RouteNames.pollDetail,
+              arguments: {'pollId': poll.pollId, 'userId': userId},
+            ).then((voted) {
+              if (voted == true && context.mounted) {
+                context.read<PollCubit>().loadPolls(userId);
+              }
+            }),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(

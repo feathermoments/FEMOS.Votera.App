@@ -49,12 +49,16 @@ class PollDetailEntity {
     required this.question,
     required this.isAnonymous,
     required this.options,
+    this.title = '',
+    this.description = '',
     this.workspaceName = '',
     this.votes = const [],
   });
 
   final int pollId;
   final String question;
+  final String title;
+  final String description;
   final bool isAnonymous;
   final List<PollOptionEntity> options;
   final String workspaceName;

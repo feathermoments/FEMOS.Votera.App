@@ -76,6 +76,8 @@ class PollCubit extends Cubit<PollState> {
     required String question,
     required List<String> options,
     required String visibility,
+    String? title,
+    String? description,
     String? expiryDate,
     bool isAnonymous = true,
   }) async {
@@ -87,6 +89,8 @@ class PollCubit extends Cubit<PollState> {
         question: question,
         options: options,
         visibility: visibility,
+        title: title,
+        description: description,
         expiryDate: expiryDate,
         isAnonymous: isAnonymous,
       );

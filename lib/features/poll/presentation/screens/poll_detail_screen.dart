@@ -68,336 +68,360 @@ class _PollDetailViewState extends State<_PollDetailView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _detail?.workspaceName ?? 'Poll',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+    return PopScope<bool>(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) Navigator.of(context).pop(_hasVoted);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            _detail?.workspaceName ?? 'Poll',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
-      ),
-      body: BlocConsumer<PollCubit, PollState>(
-        listener: (context, state) {
-          if (state is PollDetailLoaded) {
-            final votedEntry = state.poll.votes
-                .where((v) => v.userId == _userId)
-                .firstOrNull;
-            print(
-              'User $_userId voted for option ${votedEntry?.optionId}',
-            ); // Debug log
-            setState(() {
-              _detail = state.poll;
-              _hasVoted = votedEntry != null;
-              if (votedEntry != null) _selectedOptionId = votedEntry.optionId;
-            });
-          } else if (state is PollResultsLoaded) {
-            setState(() {
-              _results = state.results;
-              _isLoadingResults = false;
-            });
-          } else if (state is PollActionSuccess) {
-            setState(() {
-              _isVoting = false;
-              _hasVoted = true;
-            });
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: AppColors.success,
-              ),
-            );
-            // Load results right after voting
-            setState(() => _isLoadingResults = true);
-            context.read<PollCubit>().loadResults(widget.pollId);
-          } else if (state is PollError) {
-            setState(() {
-              _isVoting = false;
-              _isLoadingResults = false;
-            });
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: AppColors.error,
-              ),
-            );
-          }
-        },
-        builder: (context, state) {
-          if (_detail == null) {
-            return state is PollLoading
-                ? const Center(child: CircularProgressIndicator())
-                : const SizedBox.shrink();
-          }
+        body: BlocConsumer<PollCubit, PollState>(
+          listener: (context, state) {
+            if (state is PollDetailLoaded) {
+              final votedEntry = state.poll.votes
+                  .where((v) => v.userId == _userId)
+                  .firstOrNull;
+              print(
+                'User $_userId voted for option ${votedEntry?.optionId}',
+              ); // Debug log
+              setState(() {
+                _detail = state.poll;
+                _hasVoted = votedEntry != null;
+                if (votedEntry != null) _selectedOptionId = votedEntry.optionId;
+              });
+            } else if (state is PollResultsLoaded) {
+              setState(() {
+                _results = state.results;
+                _isLoadingResults = false;
+              });
+            } else if (state is PollActionSuccess) {
+              setState(() {
+                _isVoting = false;
+                _hasVoted = true;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: AppColors.success,
+                ),
+              );
+              // Load results right after voting
+              setState(() => _isLoadingResults = true);
+              context.read<PollCubit>().loadResults(widget.pollId);
+            } else if (state is PollError) {
+              setState(() {
+                _isVoting = false;
+                _isLoadingResults = false;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: AppColors.error,
+                ),
+              );
+            }
+          },
+          builder: (context, state) {
+            if (_detail == null) {
+              return state is PollLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : const SizedBox.shrink();
+            }
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: kContentMaxWidth),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ── Trust banner ──────────────────────────────────
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.blue.withAlpha(10),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: AppColors.blue.withAlpha(40),
-                          width: 1,
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: kContentMaxWidth),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ── Trust banner ──────────────────────────────────
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(7),
-                            decoration: BoxDecoration(
-                              color: AppColors.blue.withAlpha(20),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.verified_user_outlined,
-                              color: AppColors.blue,
-                              size: 16,
-                            ),
+                        decoration: BoxDecoration(
+                          color: AppColors.blue.withAlpha(10),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.blue.withAlpha(40),
+                            width: 1,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: RichText(
-                              text: TextSpan(
-                                style: AppTypography.captionSmall.copyWith(
-                                  color: AppColors.textSecondary,
-                                  height: 1.45,
-                                ),
-                                children: const [
-                                  TextSpan(
-                                    text: 'Your voice matters. ',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text:
-                                        'Votera keeps it heard—and protected.',
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // ── Question ──────────────────────────────────────
-                    Text(
-                      _detail!.question,
-                      style: AppTypography.sectionHeading,
-                    ),
-                    if (_detail!.isAnonymous) ...[
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.visibility_off_outlined,
-                            size: 14,
-                            color: AppColors.textMuted,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Anonymous poll',
-                            style: AppTypography.captionSmall,
-                          ),
-                        ],
-                      ),
-                    ],
-                    const SizedBox(height: 24),
-
-                    // ── Vote section ─────────────────────────────────
-                    if (_results.isEmpty) ...[
-                      Text(
-                        _hasVoted ? 'Your vote' : 'Cast your vote',
-                        style: AppTypography.label,
-                      ),
-                      const SizedBox(height: 12),
-                      ..._detail!.options.map((option) {
-                        final selected = _selectedOptionId == option.optionId;
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: InkWell(
-                            onTap: (_isVoting || _hasVoted)
-                                ? null
-                                : () => setState(
-                                    () => _selectedOptionId = option.optionId,
-                                  ),
-                            borderRadius: BorderRadius.circular(10),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 150),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 14,
-                              ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(7),
                               decoration: BoxDecoration(
-                                color: selected
-                                    ? AppColors.blue.withAlpha(15)
-                                    : Theme.of(
-                                        context,
-                                      ).colorScheme.surfaceContainerHighest,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: selected
-                                      ? AppColors.blue
-                                      : AppColors.metallicBorder,
-                                  width: selected ? 1.5 : 1,
-                                ),
+                                color: AppColors.blue.withAlpha(20),
+                                shape: BoxShape.circle,
                               ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    selected
-                                        ? Icons.radio_button_checked
-                                        : Icons.radio_button_off,
-                                    color: selected
-                                        ? AppColors.blue
-                                        : AppColors.textMuted,
-                                    size: 20,
+                              child: const Icon(
+                                Icons.verified_user_outlined,
+                                color: AppColors.blue,
+                                size: 16,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: RichText(
+                                text: TextSpan(
+                                  style: AppTypography.captionSmall.copyWith(
+                                    color: AppColors.textSecondary,
+                                    height: 1.45,
                                   ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Text(
-                                      option.text,
-                                      style: AppTypography.bodySmall.copyWith(
-                                        color: selected
-                                            ? AppColors.blue
-                                            : (_hasVoted
-                                                  ? AppColors.textMuted
-                                                  : Theme.of(
-                                                      context,
-                                                    ).colorScheme.onSurface),
-                                        fontWeight: selected
-                                            ? FontWeight.w700
-                                            : FontWeight.w500,
+                                  children: const [
+                                    TextSpan(
+                                      text: 'Your voice matters. ',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
                                       ),
                                     ),
-                                  ),
-                                  if (_hasVoted && selected) ...[
-                                    const SizedBox(width: 8),
-                                    const Icon(
-                                      Icons.check_circle,
-                                      color: AppColors.blue,
-                                      size: 18,
+                                    TextSpan(
+                                      text:
+                                          'Votera keeps it heard—and protected.',
                                     ),
                                   ],
-                                ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      }),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 20),
-                      if (_hasVoted) ...[
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: OutlinedButton.icon(
-                            onPressed: _isLoadingResults
-                                ? null
-                                : () {
-                                    setState(() => _isLoadingResults = true);
-                                    context.read<PollCubit>().loadResults(
-                                      widget.pollId,
-                                    );
-                                  },
-                            icon: _isLoadingResults
-                                ? const SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Icon(Icons.bar_chart_rounded),
-                            label: const Text(
-                              'View Results',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: AppColors.blue,
-                              side: const BorderSide(color: AppColors.blue),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
+                      // ── Title & Description ───────────────────────
+                      if (_detail!.title.isNotEmpty) ...[
                         Text(
-                          'You have already voted on this poll',
-                          style: AppTypography.captionSmall.copyWith(
-                            color: AppColors.textMuted,
-                          ),
-                          textAlign: TextAlign.center,
+                          _detail!.title,
+                          style: AppTypography.sectionHeading,
                         ),
-                      ] else ...[
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: (_selectedOptionId == null || _isVoting)
-                                ? null
-                                : _castVote,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.blue,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: _isVoting
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Text(
-                                    'Submit Vote',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
+                        const SizedBox(height: 6),
+                      ],
+                      if (_detail!.description.isNotEmpty) ...[
+                        Text(
+                          _detail!.description,
+                          style: AppTypography.body.copyWith(
+                            color: AppColors.textSecondary,
+                            height: 1.5,
                           ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                      // ── Question ──────────────────────────────────────
+                      Text(
+                        _detail!.question,
+                        style: AppTypography.sectionHeading,
+                      ),
+                      if (_detail!.isAnonymous) ...[
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.visibility_off_outlined,
+                              size: 14,
+                              color: AppColors.textMuted,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Anonymous poll',
+                              style: AppTypography.captionSmall,
+                            ),
+                          ],
                         ),
                       ],
-                    ],
+                      const SizedBox(height: 24),
 
-                    // ── Results section ───────────────────────────────
-                    if (_isLoadingResults) ...[
-                      const SizedBox(height: 32),
-                      const Center(child: CircularProgressIndicator()),
-                    ] else if (_results.isNotEmpty) ...[
-                      Text('Results', style: AppTypography.label),
-                      const SizedBox(height: 12),
-                      ..._results.map((r) => _ResultBar(result: r)),
+                      // ── Vote section ─────────────────────────────────
+                      if (_results.isEmpty) ...[
+                        Text(
+                          _hasVoted ? 'Your vote' : 'Cast your vote',
+                          style: AppTypography.label,
+                        ),
+                        const SizedBox(height: 12),
+                        ..._detail!.options.map((option) {
+                          final selected = _selectedOptionId == option.optionId;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: InkWell(
+                              onTap: (_isVoting || _hasVoted)
+                                  ? null
+                                  : () => setState(
+                                      () => _selectedOptionId = option.optionId,
+                                    ),
+                              borderRadius: BorderRadius.circular(10),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 150),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 14,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: selected
+                                      ? AppColors.blue.withAlpha(15)
+                                      : Theme.of(
+                                          context,
+                                        ).colorScheme.surfaceContainerHighest,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: selected
+                                        ? AppColors.blue
+                                        : AppColors.metallicBorder,
+                                    width: selected ? 1.5 : 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      selected
+                                          ? Icons.radio_button_checked
+                                          : Icons.radio_button_off,
+                                      color: selected
+                                          ? AppColors.blue
+                                          : AppColors.textMuted,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        option.text,
+                                        style: AppTypography.bodySmall.copyWith(
+                                          color: selected
+                                              ? AppColors.blue
+                                              : (_hasVoted
+                                                    ? AppColors.textMuted
+                                                    : Theme.of(
+                                                        context,
+                                                      ).colorScheme.onSurface),
+                                          fontWeight: selected
+                                              ? FontWeight.w700
+                                              : FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    if (_hasVoted && selected) ...[
+                                      const SizedBox(width: 8),
+                                      const Icon(
+                                        Icons.check_circle,
+                                        color: AppColors.blue,
+                                        size: 18,
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                        const SizedBox(height: 20),
+                        if (_hasVoted) ...[
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: OutlinedButton.icon(
+                              onPressed: _isLoadingResults
+                                  ? null
+                                  : () {
+                                      setState(() => _isLoadingResults = true);
+                                      context.read<PollCubit>().loadResults(
+                                        widget.pollId,
+                                      );
+                                    },
+                              icon: _isLoadingResults
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.bar_chart_rounded),
+                              label: const Text(
+                                'View Results',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppColors.blue,
+                                side: const BorderSide(color: AppColors.blue),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'You have already voted on this poll',
+                            style: AppTypography.captionSmall.copyWith(
+                              color: AppColors.textMuted,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ] else ...[
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed:
+                                  (_selectedOptionId == null || _isVoting)
+                                  ? null
+                                  : _castVote,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.blue,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: _isVoting
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Text(
+                                      'Submit Vote',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ],
+
+                      // ── Results section ───────────────────────────────
+                      if (_isLoadingResults) ...[
+                        const SizedBox(height: 32),
+                        const Center(child: CircularProgressIndicator()),
+                      ] else if (_results.isNotEmpty) ...[
+                        Text('Results', style: AppTypography.label),
+                        const SizedBox(height: 12),
+                        ..._results.map((r) => _ResultBar(result: r)),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

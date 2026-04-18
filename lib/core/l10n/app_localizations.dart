@@ -61,6 +61,7 @@ class AppLocalizations {
 
   // ── Dashboard ────────────────────────────────────────────────────────────
   String get dashboardTitle => _t('dashboardTitle');
+  String get dashboardRefreshTooltip => _t('dashboardRefreshTooltip');
   String get dashboardNavDashboard => _t('dashboardNavDashboard');
   String get dashboardNavMyPolls => _t('dashboardNavMyPolls');
   String get dashboardNavWorkspaces => _t('dashboardNavWorkspaces');
@@ -145,6 +146,11 @@ class AppLocalizations {
       _t('addPollNoWorkspaceDialogCancel');
   String get addPollNoWorkspaceDialogAddWorkspace =>
       _t('addPollNoWorkspaceDialogAddWorkspace');
+  String get addPollFieldLabelTitle => _t('addPollFieldLabelTitle');
+  String get addPollTitleHint => _t('addPollTitleHint');
+  String get addPollTitleRequired => _t('addPollTitleRequired');
+  String get addPollFieldLabelDescription => _t('addPollFieldLabelDescription');
+  String get addPollDescriptionHint => _t('addPollDescriptionHint');
   String get addPollFieldLabelQuestion => _t('addPollFieldLabelQuestion');
   String get addPollQuestionHint => _t('addPollQuestionHint');
   String get addPollQuestionRequired => _t('addPollQuestionRequired');

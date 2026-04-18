@@ -125,10 +125,22 @@ class _DashboardViewState extends State<_DashboardView> {
         appBar: AppBar(
           title: Text(l10n.dashboardTitle),
           automaticallyImplyLeading: false,
-          actions: [_NotificationButton()],
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh_rounded),
+              tooltip: l10n.dashboardRefreshTooltip,
+              onPressed: () => context.read<DashboardCubit>().load(),
+            ),
+            _NotificationButton(),
+          ],
         ),
         floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => Navigator.pushNamed(context, RouteNames.addPoll),
+          onPressed: () =>
+              Navigator.pushNamed(context, RouteNames.addPoll).then((created) {
+                if (created == true && context.mounted) {
+                  context.read<DashboardCubit>().load();
+                }
+              }),
           icon: const Icon(Icons.add_rounded),
           label: Text(l10n.addPollScreenTitle),
         ),
@@ -293,7 +305,12 @@ class _DashboardViewState extends State<_DashboardView> {
         actions: [_NotificationButton()],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, RouteNames.addPoll),
+        onPressed: () =>
+            Navigator.pushNamed(context, RouteNames.addPoll).then((created) {
+              if (created == true && context.mounted) {
+                context.read<DashboardCubit>().load();
+              }
+            }),
         tooltip: l10n.addPollScreenTitle,
         child: const Icon(Icons.add_rounded),
       ),
@@ -583,11 +600,16 @@ class _PollCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () => Navigator.pushNamed(
-          context,
-          RouteNames.pollDetail,
-          arguments: {'pollId': pollId, 'userId': userId},
-        ),
+        onTap: () =>
+            Navigator.pushNamed(
+              context,
+              RouteNames.pollDetail,
+              arguments: {'pollId': pollId, 'userId': userId},
+            ).then((voted) {
+              if (voted == true && context.mounted) {
+                context.read<DashboardCubit>().load();
+              }
+            }),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
