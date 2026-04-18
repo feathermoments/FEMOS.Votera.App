@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
@@ -17,7 +18,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _identifierCtrl = TextEditingController();
-  String _type = 'mobile';
+  String _type = 'email';
 
   // Optional post-auth redirect injected via route arguments.
   String? _nextRoute;
@@ -74,7 +75,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       type: _type,
                       state: state,
                       ctx: ctx,
-                      onTypeChanged: (t) => setState(() => _type = t),
+                      onTypeChanged: (t) {
+                        setState(() => _type = t);
+                        _identifierCtrl.clear();
+                        _formKey.currentState?.reset();
+                      },
                       onSubmit: () => _submit(ctx, state),
                     )
                   : _FormBody(
@@ -83,7 +88,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       type: _type,
                       state: state,
                       ctx: ctx,
-                      onTypeChanged: (t) => setState(() => _type = t),
+                      onTypeChanged: (t) {
+                        setState(() => _type = t);
+                        _identifierCtrl.clear();
+                        _formKey.currentState?.reset();
+                      },
                       onSubmit: () => _submit(ctx, state),
                     ),
             ),
@@ -293,17 +302,17 @@ class _FormBody extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _TypeChip(
-                        label: 'Mobile',
-                        selected: type == 'mobile',
-                        onTap: () => onTypeChanged('mobile'),
+                        label: 'Email',
+                        selected: type == 'email',
+                        onTap: () => onTypeChanged('email'),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _TypeChip(
-                        label: 'Email',
-                        selected: type == 'email',
-                        onTap: () => onTypeChanged('email'),
+                        label: 'Mobile',
+                        selected: type == 'mobile',
+                        onTap: () => onTypeChanged('mobile'),
                       ),
                     ),
                   ],
@@ -313,14 +322,20 @@ class _FormBody extends StatelessWidget {
                 TextFormField(
                   controller: identifierCtrl,
                   keyboardType: type == 'mobile'
-                      ? TextInputType.phone
+                      ? TextInputType.number
                       : TextInputType.emailAddress,
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_) => onSubmit(),
+                  inputFormatters: type == 'mobile'
+                      ? [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10),
+                        ]
+                      : null,
                   decoration: InputDecoration(
                     labelText: type == 'mobile' ? 'Mobile Number' : 'Email',
                     hintText: type == 'mobile'
-                        ? '9876543210'
+                        ? '10-digit mobile number'
                         : 'you@example.com',
                     prefixIcon: Icon(
                       type == 'mobile'
@@ -329,13 +344,25 @@ class _FormBody extends StatelessWidget {
                     ),
                   ),
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
+                    final val = v?.trim() ?? '';
+                    if (val.isEmpty) {
                       return type == 'mobile'
                           ? 'Mobile number is required'
                           : 'Email is required';
                     }
-                    if (type == 'email' && !v.contains('@')) {
-                      return 'Enter a valid email address';
+                    if (type == 'mobile') {
+                      if (val.length != 10) {
+                        return 'Mobile number must be exactly 10 digits';
+                      }
+                      if (!RegExp(r'^[0-9]{10}$').hasMatch(val)) {
+                        return 'Enter a valid 10-digit mobile number';
+                      }
+                    } else {
+                      if (!RegExp(
+                        r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$',
+                      ).hasMatch(val)) {
+                        return 'Enter a valid email address';
+                      }
                     }
                     return null;
                   },
