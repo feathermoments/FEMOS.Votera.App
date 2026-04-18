@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/config/app_config.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/features/dashboard/presentation/cubit/dashboard_cubit.dart';
@@ -12,7 +15,14 @@ import 'package:votera_app/features/user/presentation/cubit/user_cubit.dart';
 import 'package:votera_app/features/user/presentation/cubit/user_state.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({
+    super.key,
+    this.isNewUser = false,
+    this.isProfileComplete = true,
+  });
+
+  final bool isNewUser;
+  final bool isProfileComplete;
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +32,19 @@ class DashboardScreen extends StatelessWidget {
         BlocProvider(create: (_) => UserCubit()..loadProfile()),
         BlocProvider(create: (_) => NotificationCubit()..load()),
       ],
-      child: const _DashboardView(),
+      child: _DashboardView(
+        isNewUser: isNewUser,
+        isProfileComplete: isProfileComplete,
+      ),
     );
   }
 }
 
 class _DashboardView extends StatefulWidget {
-  const _DashboardView();
+  const _DashboardView({this.isNewUser = false, this.isProfileComplete = true});
+
+  final bool isNewUser;
+  final bool isProfileComplete;
 
   @override
   State<_DashboardView> createState() => _DashboardViewState();
@@ -36,9 +52,67 @@ class _DashboardView extends StatefulWidget {
 
 class _DashboardViewState extends State<_DashboardView> {
   int _currentTab = 0;
+  bool _showWelcome = false;
+  Timer? _welcomeTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isNewUser) {
+      _showWelcome = true;
+      _welcomeTimer = Timer(const Duration(seconds: 5), _dismissWelcome);
+    } else if (!widget.isProfileComplete) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showProfilePrompt());
+    }
+  }
+
+  @override
+  void dispose() {
+    _welcomeTimer?.cancel();
+    super.dispose();
+  }
+
+  void _dismissWelcome() {
+    if (!mounted) return;
+    _welcomeTimer?.cancel();
+    setState(() => _showWelcome = false);
+    if (!widget.isProfileComplete) {
+      _showProfilePrompt();
+    }
+  }
+
+  void _showProfilePrompt() {
+    if (!mounted) return;
+    showModalBottomSheet<void>(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetCtx) => _ProfileCompleteSheet(
+        onComplete: () {
+          Navigator.pop(sheetCtx);
+          Navigator.pushNamed(context, RouteNames.profile);
+        },
+        onSkip: () => Navigator.pop(sheetCtx),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final scaffold = _buildScaffold(context);
+    if (!_showWelcome) return scaffold;
+    return Stack(
+      children: [
+        scaffold,
+        _WelcomeOverlay(onDismiss: _dismissWelcome),
+      ],
+    );
+  }
+
+  Widget _buildScaffold(BuildContext context) {
     final isWide = context.isWide;
 
     // On wide screens, show a permanent NavigationRail sidebar instead of a drawer
@@ -506,6 +580,166 @@ class _PollCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ── Welcome overlay ───────────────────────────────────────────────────────────
+
+class _WelcomeOverlay extends StatelessWidget {
+  const _WelcomeOverlay({required this.onDismiss});
+
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        decoration: const BoxDecoration(gradient: AppColors.blueGradient),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Spacer(),
+                const Icon(
+                  Icons.how_to_vote_rounded,
+                  size: 80,
+                  color: Colors.white,
+                ),
+                const SizedBox(height: 32),
+                Text(
+                  'Welcome to ${AppConfig.appName}',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  AppConfig.tagline,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const Spacer(),
+                SizedBox(
+                  height: 52,
+                  child: ElevatedButton(
+                    onPressed: onDismiss,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: AppColors.blue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: const Text(
+                      'Get Started',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Profile completion sheet ──────────────────────────────────────────────────
+
+class _ProfileCompleteSheet extends StatelessWidget {
+  const _ProfileCompleteSheet({required this.onComplete, required this.onSkip});
+
+  final VoidCallback onComplete;
+  final VoidCallback onSkip;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Center(
+            child: Container(
+              width: 48,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.metallicBorder,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Center(
+            child: Icon(
+              Icons.person_outline_rounded,
+              size: 56,
+              color: AppColors.blue,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Complete Your Profile',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Please complete your profile to get the best experience.',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 28),
+          SizedBox(
+            height: 52,
+            child: ElevatedButton(
+              onPressed: onComplete,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.blue,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              child: const Text(
+                'Complete Profile',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextButton(
+            onPressed: onSkip,
+            child: const Text(
+              'Skip for now',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -122,27 +122,95 @@ class _AddPollFormState extends State<_AddPollForm> {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('No Workspace Found'),
-        content: const Text(
-          'You need to create a workspace before adding a poll. Would you like to add one now?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+        backgroundColor: AppColors.whiteCard,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+        titlePadding: EdgeInsets.zero,
+        title: Container(
+          decoration: const BoxDecoration(
+            gradient: AppColors.blueGradient,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(dialogContext);
-              final created = await Navigator.pushNamed(
-                context,
-                RouteNames.addWorkspace,
-              );
-              if (created == true && context.mounted) {
-                context.read<WorkspaceCubit>().loadUserWorkspaces();
-              }
-            },
-            child: const Text('Add Workspace'),
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          child: const Column(
+            children: [
+              Icon(Icons.workspaces_rounded, size: 44, color: Colors.white),
+              SizedBox(height: 10),
+              Text(
+                'No Workspace Found',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+        content: const Padding(
+          padding: EdgeInsets.only(top: 20),
+          child: Text(
+            'You need to create a workspace before adding a poll. Would you like to add one now?',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 14,
+              height: 1.5,
+            ),
+          ),
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+        actions: [
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.textSecondary,
+                    side: const BorderSide(color: AppColors.metallicBorder),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    Navigator.pop(dialogContext);
+                    final created = await Navigator.pushNamed(
+                      context,
+                      RouteNames.addWorkspace,
+                    );
+                    if (created == true && context.mounted) {
+                      context.read<WorkspaceCubit>().loadUserWorkspaces();
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.blue,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Add Workspace',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

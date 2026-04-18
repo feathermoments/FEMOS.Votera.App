@@ -40,8 +40,12 @@ abstract final class AppRouter {
           settings: settings,
         );
       case RouteNames.dashboard:
+        final dashArgs = settings.arguments as Map<String, dynamic>?;
         return MaterialPageRoute(
-          builder: (_) => const DashboardScreen(),
+          builder: (_) => DashboardScreen(
+            isNewUser: dashArgs?['isNewUser'] as bool? ?? false,
+            isProfileComplete: dashArgs?['isProfileComplete'] as bool? ?? true,
+          ),
           settings: settings,
         );
       case RouteNames.workspaces:

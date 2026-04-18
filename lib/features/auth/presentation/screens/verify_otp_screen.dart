@@ -80,7 +80,14 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
               arguments: _nextArgs,
             );
           } else {
-            Navigator.pushReplacementNamed(ctx, RouteNames.dashboard);
+            Navigator.pushReplacementNamed(
+              ctx,
+              RouteNames.dashboard,
+              arguments: {
+                'isNewUser': state.user.isNewUser,
+                'isProfileComplete': state.user.isProfileComplete,
+              },
+            );
           }
         } else if (state is OtpSent) {
           ScaffoldMessenger.of(ctx).showSnackBar(

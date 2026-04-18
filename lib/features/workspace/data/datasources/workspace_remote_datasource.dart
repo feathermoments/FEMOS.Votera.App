@@ -29,22 +29,6 @@ class WorkspaceRemoteDataSource {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getPublicWorkspaces({
-    String? search,
-  }) async {
-    try {
-      final data = await _client.get<List<dynamic>>(
-        ApiRoutes.publicWorkspaces,
-        queryParameters: search != null && search.isNotEmpty
-            ? {'search': search}
-            : null,
-      );
-      return (data ?? []).cast<Map<String, dynamic>>();
-    } on DioException catch (e) {
-      _throw(e);
-    }
-  }
-
   Future<List<Map<String, dynamic>>> searchWorkspaces(
     Map<String, dynamic> body,
   ) async {

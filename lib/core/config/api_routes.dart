@@ -12,7 +12,6 @@ abstract final class ApiRoutes {
   // ── Workspace ───────────────────────────────────────────
   static const createWorkspace = '/workspace/create';
   static const userWorkspaces = '/workspace/user';
-  static const publicWorkspaces = '/workspace/public';
   static String workspaceById(int id) => '/workspace/$id';
   static const inviteMember = '/workspace/invite-member';
   static const joinWorkspace = '/workspace/join-member';

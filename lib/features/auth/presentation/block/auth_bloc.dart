@@ -63,7 +63,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
     emit(
       AuthAuthenticated(
-        user: UserEntity(userId: 0, token: token, isNewUser: false),
+        user: UserEntity(
+          userId: 0,
+          token: token,
+          isNewUser: false,
+          isProfileComplete: true,
+        ),
       ),
     );
   }

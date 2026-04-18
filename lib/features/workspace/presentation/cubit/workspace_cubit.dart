@@ -183,16 +183,6 @@ class WorkspaceCubit extends Cubit<WorkspaceState> {
     }
   }
 
-  Future<void> loadPublicWorkspaces({String? search}) async {
-    emit(const WorkspaceLoading());
-    try {
-      final workspaces = await _repository.getPublicWorkspaces(search: search);
-      emit(PublicWorkspacesLoaded(workspaces));
-    } catch (e) {
-      emit(WorkspaceError(e.toString()));
-    }
-  }
-
   Future<void> searchWorkspaces({
     String? search,
     int? workspaceTypeId,

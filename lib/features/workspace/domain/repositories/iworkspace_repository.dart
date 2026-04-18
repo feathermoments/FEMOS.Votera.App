@@ -10,8 +10,6 @@ abstract interface class IWorkspaceRepository {
 
   Future<List<WorkspaceEntity>> getUserWorkspaces();
 
-  Future<List<WorkspaceEntity>> getPublicWorkspaces({String? search});
-
   Future<List<WorkspaceSearchResultEntity>> searchWorkspaces({
     required int userId,
     String? search,

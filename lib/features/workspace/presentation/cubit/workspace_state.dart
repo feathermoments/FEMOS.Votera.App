@@ -18,12 +18,6 @@ class WorkspaceListLoaded extends WorkspaceState {
   final List<WorkspaceEntity> workspaces;
 }
 
-class PublicWorkspacesLoaded extends WorkspaceState {
-  const PublicWorkspacesLoaded(this.workspaces);
-
-  final List<WorkspaceEntity> workspaces;
-}
-
 class WorkspaceSearchResultsLoaded extends WorkspaceState {
   const WorkspaceSearchResultsLoaded(this.results);
 

@@ -13,7 +13,7 @@ class JoinWorkspaceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => WorkspaceCubit()..loadPublicWorkspaces(),
+      create: (_) => WorkspaceCubit()..searchWorkspaces(),
       child: const _JoinWorkspaceView(),
     );
   }
@@ -29,10 +29,7 @@ class _JoinWorkspaceView extends StatefulWidget {
 class _JoinWorkspaceViewState extends State<_JoinWorkspaceView> {
   final _searchController = TextEditingController();
 
-  // Public workspaces (default view)
-  List<WorkspaceEntity> _publicWorkspaces = [];
-  // Search API results
-  List<WorkspaceSearchResultEntity> _searchResults = [];
+  List<WorkspaceSearchResultEntity> _results = [];
 
   bool _isSearchMode = false;
   bool _verifiedOnly = false;
@@ -50,17 +47,11 @@ class _JoinWorkspaceViewState extends State<_JoinWorkspaceView> {
 
   void _onSearch(BuildContext context) {
     final query = _searchController.text.trim();
-    if (query.isEmpty && !_verifiedOnly) {
-      // Revert to public list
-      setState(() => _isSearchMode = false);
-      context.read<WorkspaceCubit>().loadPublicWorkspaces();
-    } else {
-      setState(() => _isSearchMode = true);
-      context.read<WorkspaceCubit>().searchWorkspaces(
-        search: query.isNotEmpty ? query : null,
-        isVerified: _verifiedOnly ? true : null,
-      );
-    }
+    setState(() => _isSearchMode = query.isNotEmpty || _verifiedOnly);
+    context.read<WorkspaceCubit>().searchWorkspaces(
+      search: query.isNotEmpty ? query : null,
+      isVerified: _verifiedOnly ? true : null,
+    );
   }
 
   void _onClear(BuildContext context) {
@@ -69,7 +60,7 @@ class _JoinWorkspaceViewState extends State<_JoinWorkspaceView> {
       _isSearchMode = false;
       _verifiedOnly = false;
     });
-    context.read<WorkspaceCubit>().loadPublicWorkspaces();
+    context.read<WorkspaceCubit>().searchWorkspaces();
   }
 
   void _toggleVerified(BuildContext context, bool value) {
@@ -138,10 +129,8 @@ class _JoinWorkspaceViewState extends State<_JoinWorkspaceView> {
               Expanded(
                 child: BlocConsumer<WorkspaceCubit, WorkspaceState>(
                   listener: (context, state) {
-                    if (state is PublicWorkspacesLoaded) {
-                      setState(() => _publicWorkspaces = state.workspaces);
-                    } else if (state is WorkspaceSearchResultsLoaded) {
-                      setState(() => _searchResults = state.results);
+                    if (state is WorkspaceSearchResultsLoaded) {
+                      setState(() => _results = state.results);
                     } else if (state is WorkspaceActionSuccess) {
                       if (_processing.isNotEmpty) {
                         final id = _processing.first;
@@ -169,20 +158,21 @@ class _JoinWorkspaceViewState extends State<_JoinWorkspaceView> {
                   builder: (context, state) {
                     final isLoading = state is WorkspaceLoading;
 
-                    if (_isSearchMode) {
-                      // ── Search results ────────────────────────
-                      if (isLoading && _searchResults.isEmpty) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      if (_searchResults.isEmpty) {
-                        return _EmptyState(hasSearch: true);
-                      }
-                      return ListView.separated(
+                    if (isLoading && _results.isEmpty) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (_results.isEmpty) {
+                      return _EmptyState(hasSearch: _isSearchMode);
+                    }
+                    return RefreshIndicator(
+                      onRefresh: () =>
+                          context.read<WorkspaceCubit>().searchWorkspaces(),
+                      child: ListView.separated(
                         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-                        itemCount: _searchResults.length,
+                        itemCount: _results.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 10),
                         itemBuilder: (context, i) {
-                          final ws = _searchResults[i];
+                          final ws = _results[i];
                           return _SearchResultCard(
                             workspace: ws,
                             isProcessing: _processing.contains(ws.workspaceId),
@@ -190,39 +180,8 @@ class _JoinWorkspaceViewState extends State<_JoinWorkspaceView> {
                             onJoin: () => _requestJoin(context, ws.workspaceId),
                           );
                         },
-                      );
-                    } else {
-                      // ── Public workspaces ─────────────────────
-                      if (isLoading && _publicWorkspaces.isEmpty) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      if (_publicWorkspaces.isEmpty) {
-                        return _EmptyState(hasSearch: false);
-                      }
-                      return RefreshIndicator(
-                        onRefresh: () => context
-                            .read<WorkspaceCubit>()
-                            .loadPublicWorkspaces(),
-                        child: ListView.separated(
-                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-                          itemCount: _publicWorkspaces.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: 10),
-                          itemBuilder: (context, i) {
-                            final ws = _publicWorkspaces[i];
-                            return _WorkspaceJoinCard(
-                              workspace: ws,
-                              isProcessing: _processing.contains(
-                                ws.workspaceId,
-                              ),
-                              isRequested: _requested.contains(ws.workspaceId),
-                              onJoin: () =>
-                                  _requestJoin(context, ws.workspaceId),
-                            );
-                          },
-                        ),
-                      );
-                    }
+                      ),
+                    );
                   },
                 ),
               ),

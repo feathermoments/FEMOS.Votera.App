@@ -30,12 +30,6 @@ class WorkspaceRepositoryImpl implements IWorkspaceRepository {
   }
 
   @override
-  Future<List<WorkspaceEntity>> getPublicWorkspaces({String? search}) async {
-    final list = await _dataSource.getPublicWorkspaces(search: search);
-    return list.map(WorkspaceModel.fromJson).toList();
-  }
-
-  @override
   Future<List<WorkspaceSearchResultEntity>> searchWorkspaces({
     required int userId,
     String? search,

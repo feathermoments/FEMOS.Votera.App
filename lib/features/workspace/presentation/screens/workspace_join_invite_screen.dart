@@ -109,8 +109,13 @@ class _JoinInviteGateState extends State<_JoinInviteGate> {
           return _InviteDetailView(
             data: state.data,
             isJoining: false,
-            onJoin: () =>
-                ctx.read<WorkspaceCubit>().joinViaInviteCode(widget.inviteCode),
+            onJoin: () => state.data.isValid
+                ? ctx.read<WorkspaceCubit>().joinViaInviteCode(
+                    widget.inviteCode,
+                  )
+                : ctx.read<WorkspaceCubit>().requestJoinWorkspace(
+                    state.data.workspaceId,
+                  ),
             onClose: () => Navigator.pop(ctx),
           );
         }
@@ -278,21 +283,55 @@ class _InviteDetailView extends StatelessWidget {
                           ? AppColors.error
                           : AppColors.textPrimary,
                     ),
-                    // _Divider(),
-                    // _InfoRow(
-                    //   icon: Icons.group_rounded,
-                    //   label: 'Usage',
-                    //   value: '${data.usageCount} / ${data.maxUsage}',
-                    //   trailing: _UsageBar(
-                    //     used: data.usageCount,
-                    //     max: data.maxUsage,
-                    //   ),
-                    // ),
+                    _Divider(),
+                    _InfoRow(
+                      icon: Icons.group_rounded,
+                      label: 'Usage',
+                      value: '${data.usageCount} / ${data.maxUsage}',
+                      trailing: _UsageBar(
+                        used: data.usageCount,
+                        max: data.maxUsage,
+                      ),
+                    ),
                   ],
                 ),
               ),
 
               const SizedBox(height: 32),
+
+              // ── Invalid invite message ────────────────────────────
+              if (!data.isValid) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.error.withAlpha(20),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.error.withAlpha(80)),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.info_outline_rounded,
+                        size: 18,
+                        color: AppColors.error,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          data.message,
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: AppColors.error),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
 
               // ── Join button ───────────────────────────────────────
               BlocBuilder<WorkspaceCubit, WorkspaceState>(
@@ -318,9 +357,11 @@ class _InviteDetailView extends StatelessWidget {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text(
-                              'Join Workspace',
-                              style: TextStyle(
+                          : Text(
+                              data.isValid
+                                  ? 'Join Workspace'
+                                  : 'Send Request To Join',
+                              style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
                               ),
