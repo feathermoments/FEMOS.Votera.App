@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.votera.app",
+      "sha256_cert_fingerprints": [
+        "40:34:9B:00:F2:B8:5C:58:C2:57:95:A0:5E:ED:A5:B9:38:89:5C:7B:63:F1:84:71:9A:87:24:64:6B:8A:53:18"
+      ]
+    }
+  }
+]

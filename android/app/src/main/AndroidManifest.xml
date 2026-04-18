@@ -62,7 +62,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
                     android:scheme="https"
-                    android:host="yourapp.com"
+                    android:host="votera.feathermoments.com"
                     android:pathPrefix="/workspace/join/" />
             </intent-filter>
 

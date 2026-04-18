@@ -88,7 +88,7 @@
 	<!-- Universal Links (production): https://yourapp.com/workspace/join/{code} -->
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:yourapp.com</string>
+		<string>applinks:votera.feathermoments.com</string>
 	</array>
 </dict>
 </plist>
