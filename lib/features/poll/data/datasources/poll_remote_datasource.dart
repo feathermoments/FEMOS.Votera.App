@@ -8,11 +8,9 @@ class PollRemoteDataSource {
 
   final ApiClient _client;
 
-  Future<List<Map<String, dynamic>>> fetchPolls(int userId) async {
+  Future<List<Map<String, dynamic>>> fetchPolls() async {
     try {
-      final data = await _client.get<List<dynamic>>(
-        ApiRoutes.pollsByUser(userId),
-      );
+      final data = await _client.get<List<dynamic>>(ApiRoutes.getPolls);
       return (data ?? []).cast<Map<String, dynamic>>();
     } on DioException catch (e) {
       _throw(e);

@@ -10,7 +10,7 @@ class PollRepositoryImpl implements PollRepository {
 
   @override
   Future<List<PollSummaryEntity>> getPolls(int userId) async {
-    final data = await remote.fetchPolls(userId);
+    final data = await remote.fetchPolls();
     return data.map(PollSummaryModel.fromJson).toList();
   }
 
@@ -41,8 +41,9 @@ class PollRepositoryImpl implements PollRepository {
       'isAnonymous': isAnonymous,
     };
     if (title != null && title.isNotEmpty) body['title'] = title;
-    if (description != null && description.isNotEmpty)
+    if (description != null && description.isNotEmpty) {
       body['description'] = description;
+    }
     if (expiryDate != null) body['expiryDate'] = expiryDate;
     return remote.createPoll(body);
   }

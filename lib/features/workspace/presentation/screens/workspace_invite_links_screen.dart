@@ -576,7 +576,7 @@ class _CreateInviteLinkSheetState extends State<_CreateInviteLinkSheet> {
                 Text('Role to Assign', style: AppTypography.sectionHeading),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
-                  value: _roleToAssign,
+                  initialValue: _roleToAssign,
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.badge_outlined),
                   ),

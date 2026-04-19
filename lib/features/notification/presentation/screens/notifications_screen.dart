@@ -6,11 +6,9 @@ import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/features/notification/domain/entities/notification_entity.dart';
 import 'package:votera_app/features/notification/presentation/cubit/notification_cubit.dart';
 import 'package:votera_app/features/notification/presentation/cubit/notification_state.dart';
-import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/di/service_locator.dart';
 import 'package:votera_app/core/storage/secure_storage.dart';
 import 'package:votera_app/features/poll/presentation/screens/poll_detail_screen.dart';
-import 'package:votera_app/features/user/presentation/cubit/user_cubit.dart';
 import 'package:votera_app/features/workspace/presentation/screens/workspace_inbox_screen.dart';
 
 class NotificationsScreen extends StatelessWidget {

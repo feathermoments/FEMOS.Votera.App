@@ -41,8 +41,12 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
 
   @override
   void dispose() {
-    for (final c in _controllers) c.dispose();
-    for (final f in _focusNodes) f.dispose();
+    for (final c in _controllers) {
+      c.dispose();
+    }
+    for (final f in _focusNodes) {
+      f.dispose();
+    }
     super.dispose();
   }
 
@@ -62,7 +66,9 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   }
 
   void _resend(BuildContext ctx) {
-    for (final c in _controllers) c.clear();
+    for (final c in _controllers) {
+      c.clear();
+    }
     _focusNodes.first.requestFocus();
     ctx.read<AuthBloc>().add(
       SendOtpRequested(identifier: _identifier, type: _type),

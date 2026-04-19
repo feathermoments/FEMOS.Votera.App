@@ -34,7 +34,7 @@ abstract final class ApiRoutes {
   static const activePolls = '/poll/active';
   static const dashboardStats = '/poll/dashboard-stats';
   static const createPoll = '/poll/create';
-  static String pollsByUser(int userId) => '/poll/list/$userId';
+  static const getPolls = '/poll/list';
   static String pollById(int pollId) => '/poll/$pollId';
   static const castVote = '/poll/vote';
   static String pollResults(int pollId) => '/poll/results/$pollId';

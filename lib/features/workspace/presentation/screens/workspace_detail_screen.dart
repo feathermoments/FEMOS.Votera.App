@@ -84,9 +84,7 @@ class _WorkspaceDetailScreenState extends State<WorkspaceDetailScreen>
             appBar: AppBar(
               title: Text(_workspace?.name ?? 'Workspace'),
               actions: [
-                if (_workspace != null &&
-                    (_workspace!.role == 'Admin' ||
-                        _workspace!.role == 'Owner'))
+                if (_workspace != null && _workspace!.role == 'Admin')
                   IconButton(
                     icon: const Icon(Icons.link_rounded),
                     tooltip: 'Invite Links',
@@ -99,7 +97,7 @@ class _WorkspaceDetailScreenState extends State<WorkspaceDetailScreen>
                       },
                     ),
                   ),
-                if (_workspace != null)
+                if (_workspace != null && _workspace!.role == 'Admin')
                   IconButton(
                     icon: const Icon(Icons.verified_user_outlined),
                     tooltip: 'Verification',
@@ -120,8 +118,7 @@ class _WorkspaceDetailScreenState extends State<WorkspaceDetailScreen>
               ),
             ),
             floatingActionButton:
-                _workspace != null &&
-                    (_workspace!.role == 'Admin' || _workspace!.role == 'Owner')
+                _workspace != null && _workspace!.role == 'Admin'
                 ? FloatingActionButton.extended(
                     onPressed: () =>
                         Navigator.pushNamed(
@@ -152,22 +149,21 @@ class _WorkspaceDetailScreenState extends State<WorkspaceDetailScreen>
                       _MembersTab(
                         workspaceId: widget.workspaceId,
                         members: _allMembers
-                            .where((m) => m.status != 'pending')
+                            .where((m) => m.status != 'Pending')
                             .toList(),
                         isLoading:
                             state is WorkspaceLoading &&
                             _membersLoaded == false,
+                        isAdmin: _workspace?.role == 'Admin',
                       ),
                       _RequestsTab(
                         requests: _allMembers
-                            .where((m) => m.status == 'pending')
+                            .where((m) => m.status == 'Pending')
                             .toList(),
                         isLoading:
                             state is WorkspaceLoading &&
                             _membersLoaded == false,
-                        isAdmin:
-                            _workspace?.role == 'Admin' ||
-                            _workspace?.role == 'Owner',
+                        isAdmin: _workspace?.role == 'Admin',
                         onApprove: (userId) => _cubit.approveMember(
                           workspaceId: widget.workspaceId,
                           memberUserId: userId,
@@ -441,10 +437,12 @@ class _MembersTab extends StatelessWidget {
     required this.workspaceId,
     required this.members,
     required this.isLoading,
+    required this.isAdmin,
   });
   final int workspaceId;
   final List<WorkspaceMemberEntity> members;
   final bool isLoading;
+  final bool isAdmin;
 
   @override
   Widget build(BuildContext context) {
@@ -457,20 +455,96 @@ class _MembersTab extends StatelessWidget {
         message: 'No active members yet',
       );
     }
-    return ListView.separated(
-      padding: const EdgeInsets.all(16),
-      itemCount: members.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
-      itemBuilder: (_, i) =>
-          _MemberTile(workspaceId: workspaceId, member: members[i]),
+    // compute status counts
+    final total = members.length;
+    final approved = members.where((m) => m.status == 'Approved').length;
+    final rejected = members.where((m) => m.isRejected).length;
+    final declined = members.where((m) => m.isDeclined).length;
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Row(
+            children: [
+              _CountChip(label: 'Total', count: total, color: AppColors.blue),
+              const SizedBox(width: 8),
+              _CountChip(
+                label: 'Approved',
+                count: approved,
+                color: AppColors.success,
+              ),
+              const SizedBox(width: 8),
+              _CountChip(
+                label: 'Rejected',
+                count: rejected,
+                color: AppColors.error,
+              ),
+              const SizedBox(width: 8),
+              _CountChip(
+                label: 'Declined',
+                count: declined,
+                color: AppColors.warning,
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView.separated(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            itemCount: members.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            itemBuilder: (_, i) => _MemberTile(
+              workspaceId: workspaceId,
+              member: members[i],
+              isAdmin: isAdmin,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CountChip extends StatelessWidget {
+  const _CountChip({
+    required this.label,
+    required this.count,
+    required this.color,
+  });
+  final String label;
+  final int count;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withAlpha(18),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withAlpha(60)),
+      ),
+      child: Row(
+        children: [
+          Text('$count', style: AppTypography.cardTitle.copyWith(color: color)),
+          const SizedBox(width: 8),
+          Text(label, style: AppTypography.captionSmall),
+        ],
+      ),
     );
   }
 }
 
 class _MemberTile extends StatelessWidget {
-  const _MemberTile({required this.workspaceId, required this.member});
+  const _MemberTile({
+    required this.workspaceId,
+    required this.member,
+    required this.isAdmin,
+  });
   final int workspaceId;
   final WorkspaceMemberEntity member;
+  final bool isAdmin;
 
   Color get _roleColor {
     switch (member.role.toLowerCase()) {
@@ -522,87 +596,92 @@ class _MemberTile extends StatelessWidget {
               ),
             ),
             // ── badges + menu in one row ──────────────────
-            _RoleBadge(label: member.role, color: _roleColor),
             if (member.status != 'Approved') ...[
-              const SizedBox(width: 6),
               _RoleBadge(label: member.status, color: statusColor),
+              const SizedBox(width: 6),
             ],
+            _RoleBadge(label: member.role, color: _roleColor),
             const SizedBox(width: 4),
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert, size: 20),
-              padding: EdgeInsets.zero,
-              onSelected: (value) async {
-                if (value == 'remove') {
-                  final confirmed = await showDialog<bool>(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      title: const Text('Remove member'),
-                      content: Text(
-                        'Remove ${member.name} from the workspace?',
+            if (isAdmin)
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert, size: 20),
+                padding: EdgeInsets.zero,
+                onSelected: (value) async {
+                  if (value == 'remove') {
+                    final confirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text('Remove member'),
+                        content: Text(
+                          'Remove ${member.name} from the workspace?',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx, false),
+                            child: const Text('Cancel'),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.error,
+                            ),
+                            onPressed: () => Navigator.pop(ctx, true),
+                            child: const Text(
+                              'Remove',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
                       ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(ctx, false),
-                          child: const Text('Cancel'),
+                    );
+                    if (confirmed == true) {
+                      try {
+                        await context.read<WorkspaceCubit>().removeMember(
+                          workspaceId: workspaceId,
+                          userId: member.userId,
+                        );
+                        context.read<WorkspaceCubit>().loadMembers(workspaceId);
+                      } catch (_) {}
+                    }
+                  } else if (value == 'report') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Reported ${member.name}'),
+                        backgroundColor: AppColors.warning,
+                      ),
+                    );
+                  }
+                },
+                itemBuilder: (_) => const [
+                  PopupMenuItem(
+                    value: 'remove',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.person_remove_rounded,
+                          size: 18,
+                          color: Colors.red,
                         ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.error,
-                          ),
-                          onPressed: () => Navigator.pop(ctx, true),
-                          child: const Text(
-                            'Remove',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
+                        SizedBox(width: 8),
+                        Text('Remove'),
                       ],
                     ),
-                  );
-                  if (confirmed == true) {
-                    try {
-                      await context.read<WorkspaceCubit>().removeMember(
-                        workspaceId: workspaceId,
-                        userId: member.userId,
-                      );
-                      context.read<WorkspaceCubit>().loadMembers(workspaceId);
-                    } catch (_) {}
-                  }
-                } else if (value == 'report') {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Reported ${member.name}'),
-                      backgroundColor: AppColors.warning,
+                  ),
+                  PopupMenuItem(
+                    value: 'report',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.flag_rounded,
+                          size: 18,
+                          color: Colors.orange,
+                        ),
+                        SizedBox(width: 8),
+                        Text('Report'),
+                      ],
                     ),
-                  );
-                }
-              },
-              itemBuilder: (_) => const [
-                PopupMenuItem(
-                  value: 'remove',
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.person_remove_rounded,
-                        size: 18,
-                        color: Colors.red,
-                      ),
-                      SizedBox(width: 8),
-                      Text('Remove'),
-                    ],
                   ),
-                ),
-                PopupMenuItem(
-                  value: 'report',
-                  child: Row(
-                    children: [
-                      Icon(Icons.flag_rounded, size: 18, color: Colors.orange),
-                      SizedBox(width: 8),
-                      Text('Report'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+                ],
+              ),
           ],
         ),
       ),
