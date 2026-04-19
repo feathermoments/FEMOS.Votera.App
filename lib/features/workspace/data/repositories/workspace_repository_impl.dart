@@ -140,6 +140,17 @@ class WorkspaceRepositoryImpl implements IWorkspaceRepository {
   }
 
   @override
+  Future<Map<String, dynamic>> removeMember({
+    required int workspaceId,
+    required int userId,
+  }) {
+    return _dataSource.removeMember({
+      'workspaceId': workspaceId,
+      'removeUserId': userId,
+    });
+  }
+
+  @override
   Future<WorkspaceInviteLinkEntity> createInviteLink({
     required int workspaceId,
     required String expiryDate,

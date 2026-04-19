@@ -6,6 +6,12 @@ import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/features/notification/domain/entities/notification_entity.dart';
 import 'package:votera_app/features/notification/presentation/cubit/notification_cubit.dart';
 import 'package:votera_app/features/notification/presentation/cubit/notification_state.dart';
+import 'package:votera_app/core/router/route_names.dart';
+import 'package:votera_app/core/di/service_locator.dart';
+import 'package:votera_app/core/storage/secure_storage.dart';
+import 'package:votera_app/features/poll/presentation/screens/poll_detail_screen.dart';
+import 'package:votera_app/features/user/presentation/cubit/user_cubit.dart';
+import 'package:votera_app/features/workspace/presentation/screens/workspace_inbox_screen.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
@@ -136,9 +142,70 @@ class _NotificationsView extends StatelessWidget {
                     final item = notifications[index];
                     return _NotificationTile(
                       notification: item,
-                      onTap: () {
+                      onTap: () async {
                         if (!item.isRead) {
                           context.read<NotificationCubit>().markAsRead(item.id);
+                        }
+
+                        final link = item.navigationLink;
+                        if (link.isEmpty) return;
+
+                        // Ensure parseable path (add leading slash if missing)
+                        final raw = link.startsWith('/') || link.contains('://')
+                            ? link
+                            : '/$link';
+                        int userId = 0;
+                        if (userId == 0) {
+                          userId =
+                              await sl<SecureStorageService>().getUserId() ?? 0;
+                        }
+                        try {
+                          final uri = Uri.parse(raw);
+                          print('Parsed notification link URI: $uri');
+                          final seg = uri.pathSegments;
+                          print('Notification link segments: $seg');
+
+                          // Handle route: /polls/detail/{id}
+                          if (seg.length >= 3 &&
+                              seg[0] == 'polls' &&
+                              seg[1] == 'detail') {
+                            final pollId = int.tryParse(seg[2]) ?? 0;
+                            if (pollId > 0) {
+                              print(
+                                'Navigating to poll detail for pollId=$pollId',
+                              );
+
+                              await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => PollDetailScreen(
+                                    pollId: pollId,
+                                    userId: userId,
+                                  ),
+                                ),
+                              );
+                              return;
+                            }
+                          } else if (seg.length >= 2 &&
+                              seg[0] == 'workspaces' &&
+                              seg[1] == 'inbox') {
+                            // Example: /workspaces/inbox
+                            final workspaceId = int.tryParse(seg[1]) ?? 0;
+                            print(
+                              'Navigating to workspace detail for workspaceId=$workspaceId',
+                            );
+                            await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    WorkspaceInboxScreen(userId: userId),
+                              ),
+                            );
+                            return;
+                          }
+
+                          // Fallback: treat `raw` as named route
+                          //await Navigator.of(context).pushNamed(raw);
+                        } catch (_) {
+                          // ignore navigation errors
                         }
                       },
                     );

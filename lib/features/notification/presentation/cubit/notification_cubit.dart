@@ -63,5 +63,6 @@ class _ReadNotification extends NotificationEntity {
         message: n.message,
         isRead: true,
         createdAt: n.createdAt,
+        navigationLink: n.navigationLink,
       );
 }

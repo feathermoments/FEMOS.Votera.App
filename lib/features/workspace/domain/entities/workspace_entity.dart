@@ -41,6 +41,8 @@ class WorkspaceMemberEntity {
     required this.joinedOn,
     required this.isApproved,
     required this.invitedBy,
+    required this.isDeclined,
+    required this.isRejected,
   });
 
   final int userId;
@@ -52,6 +54,8 @@ class WorkspaceMemberEntity {
   final String joinedOn;
   final bool isApproved;
   final String invitedBy;
+  final bool isDeclined;
+  final bool isRejected;
 }
 
 class WorkspaceVerificationEntity {

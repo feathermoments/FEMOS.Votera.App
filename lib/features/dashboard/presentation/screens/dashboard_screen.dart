@@ -330,10 +330,18 @@ class _NotificationButton extends StatelessWidget {
           children: [
             IconButton(
               icon: const Icon(Icons.notifications_outlined),
-              onPressed: () => Navigator.pushNamed(
-                context,
-                RouteNames.notifications,
-              ).then((_) => context.read<NotificationCubit>().load()),
+              onPressed: () =>
+                  Navigator.pushNamed(context, RouteNames.notifications).then((
+                    _,
+                  ) {
+                    // Refresh notifications and dashboard when returning
+                    try {
+                      context.read<NotificationCubit>().load();
+                    } catch (_) {}
+                    try {
+                      context.read<DashboardCubit>().load();
+                    } catch (_) {}
+                  }),
             ),
             if (unread > 0)
               Positioned(

@@ -66,6 +66,34 @@ class _PollDetailViewState extends State<_PollDetailView> {
     );
   }
 
+  Future<void> _confirmAndCastVote() async {
+    if (_selectedOptionId == null) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        title: const Text('Confirm Vote'),
+        content: const Text(
+          'Are you sure you want to submit? You can vote only once.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Submit'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      _castVote();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope<bool>(
@@ -82,7 +110,7 @@ class _PollDetailViewState extends State<_PollDetailView> {
           ),
         ),
         body: BlocConsumer<PollCubit, PollState>(
-          listener: (context, state) {
+          listener: (context, state) async {
             if (state is PollDetailLoaded) {
               final votedEntry = state.poll.votes
                   .where((v) => v.userId == _userId)
@@ -105,15 +133,74 @@ class _PollDetailViewState extends State<_PollDetailView> {
                 _isVoting = false;
                 _hasVoted = true;
               });
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: AppColors.success,
+              if (!mounted) return;
+              await showDialog<void>(
+                context: context,
+                builder: (dCtx) => AlertDialog(
+                  backgroundColor: Colors.white,
+                  contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.celebration_rounded,
+                        size: 56,
+                        color: AppColors.gold,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Thank you!',
+                        style: AppTypography.sectionHeading.copyWith(
+                          fontSize: 20,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'We truly appreciate you taking the time to vote. Your choice helps shape the outcome and makes a real difference to the community.',
+                        style: AppTypography.body.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 14),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.favorite_border, color: AppColors.gold),
+                          SizedBox(width: 8),
+                          Text(
+                            'Your voice matters',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(dCtx).pop(),
+                      child: const Text('Close'),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.blue,
+                      ),
+                      onPressed: () {
+                        Navigator.of(dCtx).pop();
+                        setState(() => _isLoadingResults = true);
+                        context.read<PollCubit>().loadResults(widget.pollId);
+                      },
+                      child: const Text('View Results'),
+                    ),
+                  ],
                 ),
               );
-              // Load results right after voting
-              setState(() => _isLoadingResults = true);
-              context.read<PollCubit>().loadResults(widget.pollId);
+              // Load results right after voting (if user closed dialog without choosing View Results)
+              if (!_isLoadingResults) {
+                setState(() => _isLoadingResults = true);
+                context.read<PollCubit>().loadResults(widget.pollId);
+              }
             } else if (state is PollError) {
               setState(() {
                 _isVoting = false;
@@ -377,7 +464,7 @@ class _PollDetailViewState extends State<_PollDetailView> {
                               onPressed:
                                   (_selectedOptionId == null || _isVoting)
                                   ? null
-                                  : _castVote,
+                                  : _confirmAndCastVote,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.blue,
                                 foregroundColor: Colors.white,

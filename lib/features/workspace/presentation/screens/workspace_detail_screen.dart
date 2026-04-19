@@ -150,6 +150,7 @@ class _WorkspaceDetailScreenState extends State<WorkspaceDetailScreen>
                     children: [
                       _OverviewTab(workspace: _workspace),
                       _MembersTab(
+                        workspaceId: widget.workspaceId,
                         members: _allMembers
                             .where((m) => m.status != 'pending')
                             .toList(),
@@ -436,7 +437,12 @@ class _DetailRow extends StatelessWidget {
 // ── Members Tab ───────────────────────────────────────────────────────────────
 
 class _MembersTab extends StatelessWidget {
-  const _MembersTab({required this.members, required this.isLoading});
+  const _MembersTab({
+    required this.workspaceId,
+    required this.members,
+    required this.isLoading,
+  });
+  final int workspaceId;
   final List<WorkspaceMemberEntity> members;
   final bool isLoading;
 
@@ -455,13 +461,15 @@ class _MembersTab extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       itemCount: members.length,
       separatorBuilder: (_, __) => const SizedBox(height: 8),
-      itemBuilder: (_, i) => _MemberTile(member: members[i]),
+      itemBuilder: (_, i) =>
+          _MemberTile(workspaceId: workspaceId, member: members[i]),
     );
   }
 }
 
 class _MemberTile extends StatelessWidget {
-  const _MemberTile({required this.member});
+  const _MemberTile({required this.workspaceId, required this.member});
+  final int workspaceId;
   final WorkspaceMemberEntity member;
 
   Color get _roleColor {
@@ -478,9 +486,15 @@ class _MemberTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final initial = member.name.isNotEmpty ? member.name[0].toUpperCase() : '?';
+    final statusColor = member.isRejected
+        ? AppColors.error
+        : member.isDeclined
+        ? AppColors.warning
+        : AppColors.success;
+
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         child: Row(
           children: [
             CircleAvatar(
@@ -498,16 +512,95 @@ class _MemberTile extends StatelessWidget {
                 children: [
                   Text(member.name, style: AppTypography.cardTitle),
                   const SizedBox(height: 2),
-                  Text(member.mobileNumber, style: AppTypography.caption),
+                  Text(
+                    member.email.isNotEmpty
+                        ? member.email
+                        : member.mobileNumber,
+                    style: AppTypography.caption,
+                  ),
                 ],
               ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                _RoleBadge(label: member.role, color: _roleColor),
-                const SizedBox(height: 4),
-                _RoleBadge(label: member.status, color: AppColors.success),
+            // ── badges + menu in one row ──────────────────
+            _RoleBadge(label: member.role, color: _roleColor),
+            if (member.status != 'Approved') ...[
+              const SizedBox(width: 6),
+              _RoleBadge(label: member.status, color: statusColor),
+            ],
+            const SizedBox(width: 4),
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert, size: 20),
+              padding: EdgeInsets.zero,
+              onSelected: (value) async {
+                if (value == 'remove') {
+                  final confirmed = await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: const Text('Remove member'),
+                      content: Text(
+                        'Remove ${member.name} from the workspace?',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx, false),
+                          child: const Text('Cancel'),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.error,
+                          ),
+                          onPressed: () => Navigator.pop(ctx, true),
+                          child: const Text(
+                            'Remove',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (confirmed == true) {
+                    try {
+                      await context.read<WorkspaceCubit>().removeMember(
+                        workspaceId: workspaceId,
+                        userId: member.userId,
+                      );
+                      context.read<WorkspaceCubit>().loadMembers(workspaceId);
+                    } catch (_) {}
+                  }
+                } else if (value == 'report') {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Reported ${member.name}'),
+                      backgroundColor: AppColors.warning,
+                    ),
+                  );
+                }
+              },
+              itemBuilder: (_) => const [
+                PopupMenuItem(
+                  value: 'remove',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.person_remove_rounded,
+                        size: 18,
+                        color: Colors.red,
+                      ),
+                      SizedBox(width: 8),
+                      Text('Remove'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'report',
+                  child: Row(
+                    children: [
+                      Icon(Icons.flag_rounded, size: 18, color: Colors.orange),
+                      SizedBox(width: 8),
+                      Text('Report'),
+                    ],
+                  ),
+                ),
               ],
             ),
           ],
@@ -622,7 +715,12 @@ class _RequestTile extends StatelessWidget {
                 children: [
                   Text(member.name, style: AppTypography.cardTitle),
                   const SizedBox(height: 2),
-                  Text(member.mobileNumber, style: AppTypography.caption),
+                  Text(
+                    member.email.isNotEmpty
+                        ? member.email
+                        : member.mobileNumber,
+                    style: AppTypography.caption,
+                  ),
                   const SizedBox(height: 2),
                   Text(
                     'Requested to join',

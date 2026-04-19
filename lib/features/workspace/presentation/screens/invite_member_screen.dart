@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
@@ -158,6 +159,12 @@ class _InviteMemberViewState extends State<_InviteMemberView> {
                           ? TextInputType.phone
                           : TextInputType.emailAddress,
                       textInputAction: TextInputAction.done,
+                      inputFormatters: _contactType == 'mobile'
+                          ? <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(10),
+                            ]
+                          : <TextInputFormatter>[],
                       decoration: InputDecoration(
                         hintText: _contactType == 'mobile'
                             ? '+91 9999999999'
@@ -172,11 +179,20 @@ class _InviteMemberViewState extends State<_InviteMemberView> {
                         if (v == null || v.trim().isEmpty) {
                           return 'This field is required';
                         }
-                        if (_contactType == 'email' && !v.contains('@')) {
-                          return 'Enter a valid email address';
-                        }
-                        if (_contactType == 'mobile' && v.trim().length < 7) {
-                          return 'Enter a valid mobile number';
+                        final val = v.trim();
+                        if (_contactType == 'email') {
+                          final emailRegex = RegExp(
+                            r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}",
+                          );
+                          if (!emailRegex.hasMatch(val)) {
+                            return 'Enter a valid email address';
+                          }
+                        } else {
+                          // allow digits and common separators, but validate digit count
+                          final digits = val.replaceAll(RegExp(r'\D'), '');
+                          if (digits.length < 7 || digits.length > 10) {
+                            return 'Enter a valid mobile number (7-10 digits)';
+                          }
                         }
                         return null;
                       },

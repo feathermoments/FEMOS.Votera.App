@@ -183,6 +183,29 @@ class WorkspaceCubit extends Cubit<WorkspaceState> {
     }
   }
 
+  Future<void> removeMember({
+    required int workspaceId,
+    required int userId,
+  }) async {
+    emit(const WorkspaceLoading());
+    try {
+      final res = await _repository.removeMember(
+        workspaceId: workspaceId,
+        userId: userId,
+      );
+      final status = (res['status'] as String?)?.toLowerCase() ?? 'success';
+      final message =
+          res['message'] as String? ?? 'Member removed successfully';
+      if (status == 'failed' || status == 'fail' || status == 'error') {
+        emit(WorkspaceError(message));
+      } else {
+        emit(WorkspaceActionSuccess(message));
+      }
+    } catch (e) {
+      emit(WorkspaceError(e.toString()));
+    }
+  }
+
   Future<void> searchWorkspaces({
     String? search,
     int? workspaceTypeId,

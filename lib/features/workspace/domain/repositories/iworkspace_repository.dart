@@ -54,6 +54,11 @@ abstract interface class IWorkspaceRepository {
     required bool isAccepted,
   });
 
+  Future<Map<String, dynamic>> removeMember({
+    required int workspaceId,
+    required int userId,
+  });
+
   Future<WorkspaceInviteLinkEntity> createInviteLink({
     required int workspaceId,
     required String expiryDate,

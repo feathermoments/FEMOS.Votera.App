@@ -47,6 +47,8 @@ class WorkspaceMemberModel extends WorkspaceMemberEntity {
     required super.joinedOn,
     required super.isApproved,
     required super.invitedBy,
+    required super.isDeclined,
+    required super.isRejected,
   });
 
   factory WorkspaceMemberModel.fromJson(Map<String, dynamic> json) {
@@ -60,6 +62,10 @@ class WorkspaceMemberModel extends WorkspaceMemberEntity {
       joinedOn: json['joinedOn'] as String? ?? '',
       isApproved: json['isApproved'] as bool? ?? false,
       invitedBy: json['invitedBy'] as String? ?? '',
+      isDeclined:
+          json['isDeclined'] as bool? ?? json['IsDeclined'] as bool? ?? false,
+      isRejected:
+          json['isRejected'] as bool? ?? json['IsRejected'] as bool? ?? false,
     );
   }
 }

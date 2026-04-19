@@ -149,6 +149,18 @@ class WorkspaceRemoteDataSource {
     }
   }
 
+  Future<Map<String, dynamic>> removeMember(Map<String, dynamic> body) async {
+    try {
+      final data = await _client.post<Map<String, dynamic>>(
+        ApiRoutes.removeMember,
+        data: body,
+      );
+      return data ?? {};
+    } on DioException catch (e) {
+      _throw(e);
+    }
+  }
+
   Future<Map<String, dynamic>> createInviteLink(
     Map<String, dynamic> body,
   ) async {
