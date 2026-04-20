@@ -56,10 +56,16 @@ class WorkspaceRemoteDataSource {
 
   Future<void> inviteMember(Map<String, dynamic> body) async {
     try {
-      await _client.post<Map<String, dynamic>>(
+      final data = await _client.post<Map<String, dynamic>>(
         ApiRoutes.inviteMember,
         data: body,
       );
+      // API returns HTTP 200 with {"status":"Failed","message":"..."} on logical errors.
+      final status = data?['status'] as String?;
+      if (status != null && status.toLowerCase() == 'failed') {
+        final msg = data?['message'] as String? ?? 'Invitation failed';
+        throw ApiException(message: msg, statusCode: 200);
+      }
     } on DioException catch (e) {
       _throw(e);
     }

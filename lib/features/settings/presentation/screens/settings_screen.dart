@@ -9,6 +9,7 @@ import 'package:votera_app/core/storage/local_storage.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/theme_cubit.dart';
 import 'package:votera_app/core/widgets/gradient_app_bar.dart';
+import 'package:votera_app/core/widgets/powered_by_footer.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_bloc.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_event.dart';
 import 'package:votera_app/features/user/domain/repositories/iuser_repository.dart';
@@ -392,7 +393,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             );
                           },
                         ),
-                        const SizedBox(height: 32),
+
+                        // ── POWERED BY ───────────────────────────
+                        const PoweredByFooter(),
+                        const SizedBox(height: 16),
                       ],
                     ),
                   ),

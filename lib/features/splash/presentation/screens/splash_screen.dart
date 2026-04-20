@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
+import 'package:votera_app/core/widgets/powered_by_footer.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_bloc.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_state.dart';
 
@@ -165,13 +166,24 @@ class _SplashScreenState extends State<SplashScreen>
 
                     // ── Logo ──────────────────────────────────────
                     Center(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(28),
-                        child: Image.asset(
-                          'assets/images/app_icon.png',
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withAlpha(40),
+                              blurRadius: 20,
+                              offset: Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(24),
+                          child: Image.asset(
+                            'assets/images/app_icon.png',
+                            width: 110,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                     ),
@@ -255,7 +267,12 @@ class _SplashScreenState extends State<SplashScreen>
                       ),
                     ),
 
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 16),
+
+                    // ── Powered by ────────────────────────────────
+                    const PoweredByFooter(onDarkBackground: true),
+
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),

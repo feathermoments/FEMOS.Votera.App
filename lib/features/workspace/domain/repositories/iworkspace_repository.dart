@@ -25,6 +25,7 @@ abstract interface class IWorkspaceRepository {
     required int workspaceId,
     required String contact,
     required String contactType,
+    String? countryCode,
   });
 
   Future<void> joinWorkspace({required int workspaceId, String? inviteCode});

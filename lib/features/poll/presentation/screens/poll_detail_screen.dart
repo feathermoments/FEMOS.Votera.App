@@ -43,6 +43,17 @@ class _PollDetailViewState extends State<_PollDetailView> {
   bool _isVoting = false;
   bool _isLoadingResults = false;
   bool _hasVoted = false;
+  // Use a getter for expiry logic
+  bool get _isExpired {
+    final expiry = _detail?.expiryDate;
+    if (expiry == null || expiry.isEmpty) return false;
+    try {
+      return DateTime.parse(expiry).isBefore(DateTime.now());
+    } catch (_) {
+      return false;
+    }
+  }
+
   late int _userId;
 
   @override
@@ -110,14 +121,16 @@ class _PollDetailViewState extends State<_PollDetailView> {
               final votedEntry = state.poll.votes
                   .where((v) => v.userId == _userId)
                   .firstOrNull;
-              print(
-                'User $_userId voted for option ${votedEntry?.optionId}',
-              ); // Debug log
               setState(() {
                 _detail = state.poll;
                 _hasVoted = votedEntry != null;
                 if (votedEntry != null) _selectedOptionId = votedEntry.optionId;
               });
+              // If poll is expired, load results immediately
+              if (_isExpired && _results.isEmpty) {
+                setState(() => _isLoadingResults = true);
+                context.read<PollCubit>().loadResults(widget.pollId);
+              }
             } else if (state is PollResultsLoaded) {
               setState(() {
                 _results = state.results;
@@ -215,6 +228,9 @@ class _PollDetailViewState extends State<_PollDetailView> {
                   ? const Center(child: CircularProgressIndicator())
                   : const SizedBox.shrink();
             }
+
+            // If poll is expired, always show results
+            final showResults = _isExpired || _results.isNotEmpty;
 
             return SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -323,8 +339,8 @@ class _PollDetailViewState extends State<_PollDetailView> {
                       ],
                       const SizedBox(height: 24),
 
-                      // ── Vote section ─────────────────────────────────
-                      if (_results.isEmpty) ...[
+                      // ── Vote/Results section ─────────────────────────────
+                      if (!showResults) ...[
                         Text(
                           _hasVoted ? 'Your vote' : 'Cast your vote',
                           style: AppTypography.label,
@@ -488,11 +504,39 @@ class _PollDetailViewState extends State<_PollDetailView> {
                         ],
                       ],
 
+                      // If poll is expired, show results section and a message
+                      if (_isExpired) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: AppColors.warning.withAlpha(30),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            children: const [
+                              Icon(Icons.lock_clock, color: AppColors.warning),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'This poll has expired. Voting is closed. Results are shown below.',
+                                  style: TextStyle(
+                                    color: AppColors.warning,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+
                       // ── Results section ───────────────────────────────
                       if (_isLoadingResults) ...[
                         const SizedBox(height: 32),
                         const Center(child: CircularProgressIndicator()),
-                      ] else if (_results.isNotEmpty) ...[
+                      ] else if (showResults) ...[
                         Text('Results', style: AppTypography.label),
                         const SizedBox(height: 12),
                         ..._results.map((r) => _ResultBar(result: r)),

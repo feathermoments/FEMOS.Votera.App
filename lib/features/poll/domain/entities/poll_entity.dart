@@ -53,6 +53,7 @@ class PollDetailEntity {
     this.description = '',
     this.workspaceName = '',
     this.votes = const [],
+    this.expiryDate = '',
   });
 
   final int pollId;
@@ -60,9 +61,15 @@ class PollDetailEntity {
   final String title;
   final String description;
   final bool isAnonymous;
+  final String expiryDate;
   final List<PollOptionEntity> options;
   final String workspaceName;
   final List<VoteEntity> votes;
+
+  @override
+  String toString() {
+    return 'PollDetailEntity(pollId: $pollId, question: $question, title: $title, description: $description, isAnonymous: $isAnonymous, expiryDate: $expiryDate, options: $options, workspaceName: $workspaceName, votes: $votes)';
+  }
 }
 
 /// Result item returned by GET /poll/results/{pollId}

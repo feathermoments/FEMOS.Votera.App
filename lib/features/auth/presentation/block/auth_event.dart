@@ -7,10 +7,15 @@ class AppStarted extends AuthEvent {
 }
 
 class SendOtpRequested extends AuthEvent {
-  const SendOtpRequested({required this.identifier, required this.type});
+  const SendOtpRequested({
+    required this.identifier,
+    required this.type,
+    this.countryCode,
+  });
 
   final String identifier;
   final String type;
+  final String? countryCode;
 }
 
 class VerifyOtpRequested extends AuthEvent {

@@ -34,6 +34,7 @@ class _InviteMemberViewState extends State<_InviteMemberView> {
   final _formKey = GlobalKey<FormState>();
   final _contactCtrl = TextEditingController();
   String _contactType = 'mobile';
+  _CountryCode _selectedCountry = _kCountryCodes.first;
 
   @override
   void dispose() {
@@ -43,10 +44,74 @@ class _InviteMemberViewState extends State<_InviteMemberView> {
 
   void _submit() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
+    final rawContact = _contactCtrl.text.trim();
     context.read<WorkspaceCubit>().inviteMember(
       workspaceId: widget.workspaceId,
-      contact: _contactCtrl.text.trim(),
+      contact: rawContact,
       contactType: _contactType,
+      countryCode: _contactType == 'mobile' ? _selectedCountry.dialCode : null,
+    );
+  }
+
+  void _showCountryPicker() {
+    showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetCtx) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(0, 12, 0, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.metallicBorder,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Select Country Code',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              for (final country in _kCountryCodes)
+                RadioListTile<_CountryCode>(
+                  value: country,
+                  groupValue: _selectedCountry,
+                  activeColor: AppColors.blue,
+                  title: Text('${country.flag}  ${country.name}'),
+                  secondary: Text(
+                    country.dialCode,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  onChanged: (selected) {
+                    if (selected != null) {
+                      setState(() {
+                        _selectedCountry = selected;
+                        _contactCtrl.clear();
+                      });
+                    }
+                    Navigator.pop(sheetCtx);
+                  },
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -75,7 +140,8 @@ class _InviteMemberViewState extends State<_InviteMemberView> {
         appBar: GradientAppBar(
           title: AppLocalizations.of(context).inviteMemberTitle,
         ),
-        body: Center(
+        body: Align(
+          alignment: Alignment.topCenter,
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: kContentMaxWidth),
             child: SingleChildScrollView(
@@ -157,24 +223,51 @@ class _InviteMemberViewState extends State<_InviteMemberView> {
                     TextFormField(
                       controller: _contactCtrl,
                       keyboardType: _contactType == 'mobile'
-                          ? TextInputType.phone
+                          ? TextInputType.number
                           : TextInputType.emailAddress,
                       textInputAction: TextInputAction.done,
                       inputFormatters: _contactType == 'mobile'
                           ? <TextInputFormatter>[
                               FilteringTextInputFormatter.digitsOnly,
-                              LengthLimitingTextInputFormatter(10),
+                              LengthLimitingTextInputFormatter(
+                                _selectedCountry.maxDigits,
+                              ),
                             ]
                           : <TextInputFormatter>[],
                       decoration: InputDecoration(
                         hintText: _contactType == 'mobile'
-                            ? '+91 9999999999'
+                            ? '${'0' * _selectedCountry.maxDigits}'
                             : 'member@example.com',
-                        prefixIcon: Icon(
-                          _contactType == 'mobile'
-                              ? Icons.phone_outlined
-                              : Icons.email_outlined,
-                        ),
+                        // ── Country code prefix (mobile only) ───
+                        prefix: _contactType == 'mobile'
+                            ? GestureDetector(
+                                onTap: _showCountryPicker,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      '${_selectedCountry.flag}  ${_selectedCountry.dialCode}',
+                                      style: const TextStyle(fontSize: 15),
+                                    ),
+                                    const Icon(
+                                      Icons.arrow_drop_down,
+                                      size: 18,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Container(
+                                      width: 1,
+                                      height: 18,
+                                      color: AppColors.metallicBorder,
+                                    ),
+                                    const SizedBox(width: 8),
+                                  ],
+                                ),
+                              )
+                            : null,
+                        prefixIcon: _contactType == 'mobile'
+                            ? const Icon(Icons.phone_outlined)
+                            : const Icon(Icons.email_outlined),
                       ),
                       validator: (v) {
                         if (v == null || v.trim().isEmpty) {
@@ -189,10 +282,10 @@ class _InviteMemberViewState extends State<_InviteMemberView> {
                             return 'Enter a valid email address';
                           }
                         } else {
-                          // allow digits and common separators, but validate digit count
                           final digits = val.replaceAll(RegExp(r'\D'), '');
-                          if (digits.length < 7 || digits.length > 10) {
-                            return 'Enter a valid mobile number (7-10 digits)';
+                          if (digits.length < _selectedCountry.minDigits ||
+                              digits.length > _selectedCountry.maxDigits) {
+                            return 'Enter a valid ${_selectedCountry.maxDigits}-digit mobile number';
                           }
                         }
                         return null;
@@ -248,6 +341,44 @@ class _InviteMemberViewState extends State<_InviteMemberView> {
     );
   }
 }
+// ── Country Code model ──────────────────────────────────────────────────────────
+
+class _CountryCode {
+  const _CountryCode({
+    required this.name,
+    required this.flag,
+    required this.dialCode,
+    required this.minDigits,
+    required this.maxDigits,
+  });
+
+  final String name;
+  final String flag;
+  final String dialCode;
+  final int minDigits;
+  final int maxDigits;
+
+  @override
+  bool operator ==(Object other) =>
+      other is _CountryCode && other.dialCode == dialCode;
+
+  @override
+  int get hashCode => dialCode.hashCode;
+}
+
+const List<_CountryCode> _kCountryCodes = [
+  _CountryCode(
+    name: 'India',
+    flag: '🇮🇳',
+    dialCode: '+91',
+    minDigits: 10,
+    maxDigits: 10,
+  ),
+  // Add more countries here when needed, e.g.:
+  // _CountryCode(name: 'United States', flag: '🇺🇸', dialCode: '+1', minDigits: 10, maxDigits: 10),
+  // _CountryCode(name: 'United Kingdom', flag: '🇬🇧', dialCode: '+44', minDigits: 10, maxDigits: 11),
+  // _CountryCode(name: 'Australia', flag: '🇦🇺', dialCode: '+61', minDigits: 9, maxDigits: 9),
+];
 
 class _TypeTile extends StatelessWidget {
   const _TypeTile({

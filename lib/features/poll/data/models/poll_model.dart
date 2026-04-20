@@ -63,6 +63,7 @@ class PollDetailModel extends PollDetailEntity {
     super.description,
     super.workspaceName,
     super.votes,
+    super.expiryDate,
   });
 
   factory PollDetailModel.fromJson(Map<String, dynamic> json) {
@@ -81,6 +82,7 @@ class PollDetailModel extends PollDetailEntity {
       options: opts,
       workspaceName: json['workspaceName'] as String? ?? '',
       votes: vts,
+      expiryDate: json['expiryDate'] as String? ?? '',
     );
   }
 }

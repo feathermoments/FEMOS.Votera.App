@@ -59,6 +59,7 @@ class WorkspaceCubit extends Cubit<WorkspaceState> {
     required int workspaceId,
     required String contact,
     required String contactType,
+    String? countryCode,
   }) async {
     emit(const WorkspaceLoading());
     try {
@@ -66,6 +67,7 @@ class WorkspaceCubit extends Cubit<WorkspaceState> {
         workspaceId: workspaceId,
         contact: contact,
         contactType: contactType,
+        countryCode: countryCode,
       );
       emit(const WorkspaceActionSuccess('Invitation sent successfully'));
     } catch (e) {

@@ -12,11 +12,17 @@ class AuthRemoteDataSource {
   Future<bool> sendOtp({
     required String identifier,
     required String type,
+    String? countryCode,
   }) async {
     try {
+      final body = <String, dynamic>{
+        'identifier': identifier,
+        'type': type,
+        if (countryCode != null) 'countryCode': countryCode,
+      };
       final data = await _client.post<Map<String, dynamic>>(
         ApiRoutes.sendOtp,
-        data: {'identifier': identifier, 'type': type},
+        data: body,
       );
       return data?['isExistingUser'] as bool? ?? false;
     } on DioException catch (e) {

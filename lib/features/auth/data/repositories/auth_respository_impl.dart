@@ -11,8 +11,16 @@ class AuthRepositoryImpl implements IAuthRepository {
   final SecureStorageService _storage;
 
   @override
-  Future<bool> sendOtp({required String identifier, required String type}) {
-    return _dataSource.sendOtp(identifier: identifier, type: type);
+  Future<bool> sendOtp({
+    required String identifier,
+    required String type,
+    String? countryCode,
+  }) {
+    return _dataSource.sendOtp(
+      identifier: identifier,
+      type: type,
+      countryCode: countryCode,
+    );
   }
 
   @override

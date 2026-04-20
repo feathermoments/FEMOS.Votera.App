@@ -376,6 +376,7 @@ class _WorkspaceDetailScreenState extends State<WorkspaceDetailScreen>
                         onLeave: _workspace?.role != 'Admin'
                             ? () => _confirmExit(context)
                             : null,
+                        selected: _tabs.index == 0,
                       ),
                       _MembersTab(
                         workspaceId: widget.workspaceId,
@@ -418,9 +419,14 @@ class _WorkspaceDetailScreenState extends State<WorkspaceDetailScreen>
 // ── Overview Tab ──────────────────────────────────────────────────────────────
 
 class _OverviewTab extends StatelessWidget {
-  const _OverviewTab({required this.workspace, this.onLeave});
+  const _OverviewTab({
+    required this.workspace,
+    this.onLeave,
+    this.selected = false,
+  });
   final WorkspaceEntity? workspace;
   final VoidCallback? onLeave;
+  final bool selected;
 
   @override
   Widget build(BuildContext context) {
@@ -441,17 +447,29 @@ class _OverviewTab extends StatelessWidget {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  gradient: AppColors.blueGradient,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.blue.withAlpha(60),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
+                decoration: selected
+                    ? BoxDecoration(
+                        gradient: AppColors.blueGradient,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.blue.withAlpha(60),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      )
+                    : BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(10),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

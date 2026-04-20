@@ -24,6 +24,14 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   );
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _focusNodes.first.requestFocus();
+    });
+  }
+
   late final String _identifier;
   late final String _type;
   String? _nextRoute;
@@ -54,8 +62,35 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   String get _otp => _controllers.map((c) => c.text).join();
 
   void _onDigitEntered(int index, String value) {
-    if (value.isNotEmpty && index < 5) _focusNodes[index + 1].requestFocus();
-    if (value.isEmpty && index > 0) _focusNodes[index - 1].requestFocus();
+    final digits = value.replaceAll(RegExp(r'[^0-9]'), '');
+
+    // ── Paste scenario: multiple digits at once ────────────────
+    if (digits.length > 1) {
+      _distributePaste(digits, startIndex: index);
+      return;
+    }
+
+    // ── Single digit typed ─────────────────────────────────────
+    if (digits.isNotEmpty) {
+      _controllers[index].text = digits;
+      if (index < 5) _focusNodes[index + 1].requestFocus();
+    } else {
+      // Backspace
+      if (index > 0) _focusNodes[index - 1].requestFocus();
+    }
+
+    if (_otp.length == 6) _verify(context);
+  }
+
+  /// Distributes [digits] across boxes starting at [startIndex].
+  void _distributePaste(String digits, {int startIndex = 0}) {
+    for (int i = 0; i < digits.length && (startIndex + i) < 6; i++) {
+      _controllers[startIndex + i].text = digits[i];
+    }
+    // Focus next empty box, or stay on the last filled box.
+    final lastFilled = (startIndex + digits.length - 1).clamp(0, 5);
+    final nextFocus = lastFilled < 5 ? lastFilled + 1 : 5;
+    _focusNodes[nextFocus].requestFocus();
     if (_otp.length == 6) _verify(context);
   }
 
@@ -168,7 +203,6 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                               focusNode: _focusNodes[i],
                               keyboardType: TextInputType.number,
                               textAlign: TextAlign.center,
-                              maxLength: 1,
                               readOnly: isLoading,
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,

@@ -11,9 +11,9 @@ abstract interface class PollRepository {
     required String question,
     required List<String> options,
     required String visibility,
+    required String? expiryDate,
     String? title,
     String? description,
-    String? expiryDate,
     bool isAnonymous = true,
   });
 

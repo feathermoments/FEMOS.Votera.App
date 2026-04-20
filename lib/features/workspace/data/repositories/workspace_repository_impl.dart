@@ -61,12 +61,15 @@ class WorkspaceRepositoryImpl implements IWorkspaceRepository {
     required int workspaceId,
     required String contact,
     required String contactType,
+    String? countryCode,
   }) {
-    return _dataSource.inviteMember({
+    final body = <String, dynamic>{
       'workspaceId': workspaceId,
       'contact': contact,
       'contactType': contactType,
-    });
+    };
+    if (countryCode != null) body['countryCode'] = countryCode;
+    return _dataSource.inviteMember(body);
   }
 
   @override

@@ -7,7 +7,7 @@ class ApiException implements Exception {
   final dynamic data;
 
   @override
-  String toString() => 'ApiException($statusCode): $message';
+  String toString() => 'Message: $message'; //($statusCode)
 
   bool get isUnauthorized => statusCode == 401;
   bool get isForbidden => statusCode == 403;

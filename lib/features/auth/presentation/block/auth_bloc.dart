@@ -26,7 +26,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(const AuthLoading());
     try {
-      await _repository.sendOtp(identifier: event.identifier, type: event.type);
+      await _repository.sendOtp(
+        identifier: event.identifier,
+        type: event.type,
+        countryCode: event.countryCode,
+      );
       emit(OtpSent(identifier: event.identifier, type: event.type));
     } catch (e) {
       emit(AuthError(e.toString()));
