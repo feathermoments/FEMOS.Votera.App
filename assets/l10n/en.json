@@ -1,6 +1,28 @@
 {
   "appName": "Votera",
   "appTagline": "Every Voice Matters",
+  "splashQuotes": [
+    "Your Voice. Your Decision.",
+    "Empowering Every Vote.",
+    "Decisions Made Simple.",
+    "Where Opinions Matter.",
+    "Vote. Decide. Impact.",
+    "Speak Up. We're Listening.",
+    "Your Opinion Counts!",
+    "Make Every Vote Matter.",
+    "Be Heard. Be Counted.",
+    "Tap. Vote. Done.",
+    "Decide Together.",
+    "Vote Smarter.",
+    "Instant Polls. Real Decisions.",
+    "Quick Votes. Big Impact.",
+    "Your Community, Your Choice.",
+    "Stronger Communities Through Every Vote.",
+    "Together We Decide.",
+    "One Vote, Many Voices.",
+    "Connecting Voices, Making Decisions.",
+    "For Society. By Society."
+  ],
 
   "loginSignIn": "Sign In",
   "loginSubtitle": "Enter your mobile or email to continue",

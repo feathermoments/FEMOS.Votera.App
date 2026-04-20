@@ -389,6 +389,19 @@ class _DashboardContent extends StatelessWidget {
         }
         final polls = (state as DashboardLoaded).activePolls;
         final stats = state.stats;
+        final l10n = AppLocalizations.of(context);
+        // Use `watch` so the widget rebuilds when the UserCubit's state changes
+        final profile = context.watch<UserCubit>().currentProfile;
+        final String welcomeSubtitle = (profile != null)
+            ? (profile.name.isNotEmpty
+                  ? profile.name
+                  : (profile.mobile.isNotEmpty
+                        ? profile.mobile
+                        : (profile.email.isNotEmpty
+                              ? profile.email
+                              : l10n.dashboardVoteraSubtitle)))
+            : l10n.dashboardVoteraSubtitle;
+
         return RefreshIndicator(
           onRefresh: () => context.read<DashboardCubit>().load(),
           color: AppColors.blue,
@@ -420,15 +433,19 @@ class _DashboardContent extends StatelessWidget {
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(5),
                             decoration: BoxDecoration(
                               color: Colors.white.withAlpha(40),
                               borderRadius: BorderRadius.circular(14),
                             ),
-                            child: const Icon(
-                              Icons.how_to_vote_rounded,
-                              color: Colors.white,
-                              size: 28,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
+                              child: Image.asset(
+                                'assets/images/logo.png',
+                                width: 35,
+                                height: 35,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 14),
@@ -447,9 +464,7 @@ class _DashboardContent extends StatelessWidget {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                AppLocalizations.of(
-                                  context,
-                                ).dashboardVoteraSubtitle,
+                                welcomeSubtitle,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
@@ -735,10 +750,12 @@ class _WelcomeOverlay extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const Spacer(),
-                const Icon(
-                  Icons.how_to_vote_rounded,
-                  size: 80,
+                Image.asset(
+                  'assets/images/app_icon.png',
+                  width: 80,
+                  height: 80,
                   color: Colors.white,
+                  fit: BoxFit.contain,
                 ),
                 const SizedBox(height: 32),
                 Text(

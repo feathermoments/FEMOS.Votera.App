@@ -19,11 +19,17 @@ import 'package:votera_app/features/workspace/presentation/screens/workspace_lis
 import 'package:votera_app/features/notification/presentation/screens/notifications_screen.dart';
 import 'package:votera_app/features/settings/presentation/screens/settings_screen.dart';
 import 'package:votera_app/features/user/presentation/screens/profile_screen.dart';
+import 'package:votera_app/features/splash/presentation/screens/splash_screen.dart';
 import 'package:votera_app/features/workspace/presentation/screens/workspace_verification_screen.dart';
 
 abstract final class AppRouter {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case RouteNames.splash:
+        return MaterialPageRoute(
+          builder: (_) => const SplashScreen(),
+          settings: settings,
+        );
       case RouteNames.login:
         return MaterialPageRoute(
           builder: (_) => const LoginScreen(),

@@ -9,6 +9,7 @@ import 'package:votera_app/features/notification/presentation/cubit/notification
 import 'package:votera_app/core/di/service_locator.dart';
 import 'package:votera_app/core/storage/secure_storage.dart';
 import 'package:votera_app/features/poll/presentation/screens/poll_detail_screen.dart';
+import 'package:votera_app/features/workspace/presentation/screens/workspace_detail_screen.dart';
 import 'package:votera_app/features/workspace/presentation/screens/workspace_inbox_screen.dart';
 
 class NotificationsScreen extends StatelessWidget {
@@ -187,14 +188,23 @@ class _NotificationsView extends StatelessWidget {
                               seg[0] == 'workspaces' &&
                               seg[1] == 'inbox') {
                             // Example: /workspaces/inbox
-                            final workspaceId = int.tryParse(seg[1]) ?? 0;
-                            print(
-                              'Navigating to workspace detail for workspaceId=$workspaceId',
-                            );
                             await Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (_) =>
                                     WorkspaceInboxScreen(userId: userId),
+                              ),
+                            );
+                            return;
+                          } else if (seg.length >= 3 &&
+                              seg[0] == 'workspaces' &&
+                              seg[1] == 'detail') {
+                            // Example: /workspaces/detail/{id}
+                            final workspaceId = int.tryParse(seg[2]) ?? 0;
+                            await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => WorkspaceDetailScreen(
+                                  workspaceId: workspaceId,
+                                ),
                               ),
                             );
                             return;

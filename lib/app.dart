@@ -15,9 +15,45 @@ import 'package:votera_app/core/theme/theme_cubit.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_bloc.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_event.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_state.dart';
+import 'package:votera_app/features/splash/presentation/screens/splash_screen.dart';
 
-class VoteraApp extends StatelessWidget {
+class VoteraApp extends StatefulWidget {
   const VoteraApp({super.key});
+
+  @override
+  State<VoteraApp> createState() => _VoteraAppState();
+}
+
+class _VoteraAppState extends State<VoteraApp> {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  late final AppLinks _appLinks;
+  StreamSubscription<Uri>? _linkSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _appLinks = AppLinks();
+    _linkSub = _appLinks.uriLinkStream.listen(_handleForegroundLink);
+  }
+
+  @override
+  void dispose() {
+    _linkSub?.cancel();
+    super.dispose();
+  }
+
+  void _handleForegroundLink(Uri uri) {
+    final segments = uri.pathSegments;
+    if (segments.length >= 3 &&
+        segments[0] == 'workspace' &&
+        segments[1] == 'join' &&
+        segments[2].isNotEmpty) {
+      _navigatorKey.currentState?.pushNamed(
+        RouteNames.workspaceJoinInvite,
+        arguments: segments[2],
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +66,7 @@ class VoteraApp extends StatelessWidget {
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) => BlocBuilder<LocaleCubit, Locale>(
           builder: (context, locale) => MaterialApp(
+            navigatorKey: _navigatorKey,
             onGenerateTitle: (context) => AppLocalizations.of(context).appName,
             debugShowCheckedModeBanner: false,
             theme: AppTheme.light,
@@ -52,7 +89,7 @@ class VoteraApp extends StatelessWidget {
               return const Locale('en');
             },
             onGenerateRoute: AppRouter.onGenerateRoute,
-            home: const _AuthGate(),
+            home: const SplashScreen(),
           ),
         ),
       ),
