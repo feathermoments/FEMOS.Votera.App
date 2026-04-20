@@ -83,3 +83,7 @@ class WorkspaceError extends WorkspaceState {
 
   final String message;
 }
+
+class WorkspaceExitSuccess extends WorkspaceState {
+  const WorkspaceExitSuccess();
+}

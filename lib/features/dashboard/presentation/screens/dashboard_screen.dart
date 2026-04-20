@@ -6,6 +6,7 @@ import 'package:votera_app/core/config/app_config.dart';
 import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
+import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_bloc.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_event.dart';
 import 'package:votera_app/features/dashboard/presentation/cubit/dashboard_cubit.dart';
@@ -122,12 +123,12 @@ class _DashboardViewState extends State<_DashboardView> {
     // On wide screens, show a permanent NavigationRail sidebar instead of a drawer
     if (isWide) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.dashboardTitle),
+        appBar: GradientAppBar(
+          title: l10n.dashboardTitle,
           automaticallyImplyLeading: false,
           actions: [
             IconButton(
-              icon: const Icon(Icons.refresh_rounded),
+              icon: const Icon(Icons.refresh_rounded, color: Colors.white),
               tooltip: l10n.dashboardRefreshTooltip,
               onPressed: () => context.read<DashboardCubit>().load(),
             ),
@@ -294,11 +295,11 @@ class _DashboardViewState extends State<_DashboardView> {
         currentTab: _currentTab,
         onTabSelected: (i) => setState(() => _currentTab = i),
       ),
-      appBar: AppBar(
-        title: Text(l10n.dashboardTitle),
+      appBar: GradientAppBar(
+        title: l10n.dashboardTitle,
         leading: Builder(
           builder: (ctx) => IconButton(
-            icon: const Icon(Icons.menu_rounded),
+            icon: const Icon(Icons.menu_rounded, color: Colors.white),
             onPressed: () => Scaffold.of(ctx).openDrawer(),
           ),
         ),

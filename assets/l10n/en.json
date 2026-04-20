@@ -210,5 +210,13 @@
   "pollsListTitle": "My Polls",
   "pollsHomeTitle": "Polls",
   "notificationsTitle": "Notifications",
-  "notificationsRetry": "Retry"
+  "notificationsRetry": "Retry",
+
+  "workspaceLeaveButton": "Leave Workspace",
+  "workspaceLeaveDialogTitle": "Leave Workspace",
+  "workspaceLeaveDialogBody": "You are about to leave ",
+  "workspaceLeaveDialogBodySuffix": ". You will immediately lose access to all polls and workspace data.",
+  "workspaceLeaveDialogWarning": "This action cannot be undone. Contact an admin to rejoin.",
+  "workspaceLeaveConfirm": "Leave",
+  "workspaceLeaveCancel": "Cancel"
 }

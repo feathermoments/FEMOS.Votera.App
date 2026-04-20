@@ -25,6 +25,7 @@ abstract final class ApiRoutes {
   static const memberInvites = '/workspace/member-invites';
   static const respondInvite = '/workspace/respond-invite';
   static const removeMember = '/workspace/remove-member';
+  static const exitWorkspace = '/workspace/exit';
   static const createInviteLink = '/workspace/create-invite';
   static String workspaceInviteLinks(int id) => '/workspace/$id/invites';
   static const validateInvite = '/workspace/validate-invite';

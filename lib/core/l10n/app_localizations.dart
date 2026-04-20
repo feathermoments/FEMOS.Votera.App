@@ -270,6 +270,16 @@ class AppLocalizations {
   String get pollsHomeTitle => _t('pollsHomeTitle');
   String get notificationsTitle => _t('notificationsTitle');
   String get notificationsRetry => _t('notificationsRetry');
+
+  // ── Workspace detail ──────────────────────────────────────────────────────
+  String get workspaceLeaveButton => _t('workspaceLeaveButton');
+  String get workspaceLeaveDialogTitle => _t('workspaceLeaveDialogTitle');
+  String get workspaceLeaveDialogBody => _t('workspaceLeaveDialogBody');
+  String get workspaceLeaveDialogBodySuffix =>
+      _t('workspaceLeaveDialogBodySuffix');
+  String get workspaceLeaveDialogWarning => _t('workspaceLeaveDialogWarning');
+  String get workspaceLeaveConfirm => _t('workspaceLeaveConfirm');
+  String get workspaceLeaveCancel => _t('workspaceLeaveCancel');
 }
 
 class _AppLocalizationsDelegate

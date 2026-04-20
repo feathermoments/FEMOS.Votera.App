@@ -5,6 +5,7 @@ import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
+import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_bloc.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_event.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_state.dart';
@@ -114,9 +115,12 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
       builder: (ctx, state) {
         final isLoading = state is AuthLoading;
         return Scaffold(
-          appBar: AppBar(
-            title: Text(AppLocalizations.of(ctx).verifyOtpScreenTitle),
-            leading: BackButton(onPressed: () => Navigator.pop(ctx)),
+          appBar: GradientAppBar(
+            title: AppLocalizations.of(ctx).verifyOtpScreenTitle,
+            leading: BackButton(
+              color: Colors.white,
+              onPressed: () => Navigator.pop(ctx),
+            ),
           ),
           body: SafeArea(
             child: Center(

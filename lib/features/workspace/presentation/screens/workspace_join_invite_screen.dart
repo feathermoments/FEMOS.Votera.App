@@ -5,6 +5,7 @@ import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/storage/secure_storage.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
+import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/features/workspace/domain/entities/workspace_entity.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_cubit.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_state.dart';
@@ -197,10 +198,10 @@ class _InviteDetailView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.whiteSurface,
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context).workspaceJoinInviteTitle),
+      appBar: GradientAppBar(
+        title: AppLocalizations.of(context).workspaceJoinInviteTitle,
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded),
+          icon: const Icon(Icons.close_rounded, color: Colors.white),
           onPressed: onClose,
         ),
       ),
@@ -488,7 +489,15 @@ class _InfoRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: AppColors.textMuted),
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: AppColors.blue.withAlpha(12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 15, color: AppColors.blue),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -572,10 +581,10 @@ class _ErrorView extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context).workspaceInviteErrorTitle),
+      appBar: GradientAppBar(
+        title: AppLocalizations.of(context).workspaceInviteErrorTitle,
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded),
+          icon: const Icon(Icons.close_rounded, color: Colors.white),
           onPressed: onClose,
         ),
       ),
@@ -585,12 +594,20 @@ class _ErrorView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Icon(
-              Icons.link_off_rounded,
-              size: 64,
-              color: AppColors.error,
+            Container(
+              width: 72,
+              height: 72,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: AppColors.error.withAlpha(12),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.link_off_rounded,
+                size: 34,
+                color: AppColors.error,
+              ),
             ),
-            const SizedBox(height: 20),
             Text(
               AppLocalizations.of(context).workspaceInviteErrorHeading,
               textAlign: TextAlign.center,
@@ -610,13 +627,28 @@ class _ErrorView extends StatelessWidget {
             const SizedBox(height: 32),
             OutlinedButton(
               onPressed: onRetry,
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                side: const BorderSide(
+                  color: AppColors.metallicBorder,
+                  width: 1,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
               child: Text(
                 AppLocalizations.of(context).workspaceInviteRetryButton,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
               ),
             ),
             const SizedBox(height: 12),
             TextButton(
               onPressed: onClose,
+              style: TextButton.styleFrom(foregroundColor: AppColors.textMuted),
               child: Text(
                 AppLocalizations.of(context).workspaceInviteCloseButton,
               ),

@@ -5,6 +5,7 @@ import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
+import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/features/workspace/domain/entities/workspace_entity.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_cubit.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_state.dart';
@@ -27,12 +28,12 @@ class _WorkspaceListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context).workspaceListTitle),
+      appBar: GradientAppBar(
+        title: AppLocalizations.of(context).workspaceListTitle,
         actions: [
           IconButton(
             tooltip: 'Join a workspace',
-            icon: const Icon(Icons.group_add_outlined),
+            icon: const Icon(Icons.group_add_outlined, color: Colors.white),
             onPressed: () =>
                 Navigator.pushNamed(context, RouteNames.joinWorkspace),
           ),
@@ -127,17 +128,30 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(40),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.workspaces_outlined,
-              size: 72,
-              color: AppColors.textFaint,
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: AppColors.blue.withAlpha(12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.workspaces_outlined,
+                size: 34,
+                color: AppColors.blue.withAlpha(100),
+              ),
             ),
             const SizedBox(height: 16),
-            Text('No workspaces yet', style: AppTypography.sectionHeading),
+            Text(
+              'No workspaces yet',
+              style: AppTypography.sectionHeading.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
             const SizedBox(height: 6),
             Text(
               'Create a workspace to start managing polls with your team',
@@ -147,9 +161,22 @@ class _EmptyState extends StatelessWidget {
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: onAdd,
-              icon: const Icon(Icons.add),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.blue,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 13,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              icon: const Icon(Icons.add, size: 18),
               label: Text(
                 AppLocalizations.of(context).workspaceListCreateButton,
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -166,9 +193,14 @@ class _WorkspaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.metallicBorder, width: 0.8),
+      ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(16),

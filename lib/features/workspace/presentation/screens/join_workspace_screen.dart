@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
+import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
 import 'package:votera_app/features/workspace/domain/entities/workspace_entity.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_cubit.dart';
@@ -77,8 +78,8 @@ class _JoinWorkspaceViewState extends State<_JoinWorkspaceView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context).joinWorkspaceTitle),
+      appBar: GradientAppBar(
+        title: AppLocalizations.of(context).joinWorkspaceTitle,
       ),
       body: Center(
         child: ConstrainedBox(
@@ -216,10 +217,18 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.workspaces_outlined,
-              size: 72,
-              color: AppColors.textFaint,
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: AppColors.blue.withAlpha(12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.workspaces_outlined,
+                size: 34,
+                color: AppColors.blue.withAlpha(100),
+              ),
             ),
             const SizedBox(height: 16),
             Text(
@@ -262,9 +271,12 @@ class _SearchResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.metallicBorder, width: 0.8),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Row(
@@ -322,7 +334,7 @@ class _SearchResultCard extends StatelessWidget {
                   Text(
                     workspace.workspaceTypeName,
                     style: AppTypography.caption.copyWith(
-                      color: cs.onSurfaceVariant,
+                      color: AppColors.textMuted,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -331,7 +343,7 @@ class _SearchResultCard extends StatelessWidget {
                       Icon(
                         Icons.people_outline,
                         size: 13,
-                        color: cs.onSurfaceVariant,
+                        color: AppColors.textMuted,
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -339,7 +351,7 @@ class _SearchResultCard extends StatelessWidget {
                           context,
                         ).joinWorkspaceMemberCount(workspace.memberCount),
                         style: AppTypography.caption.copyWith(
-                          color: cs.onSurfaceVariant,
+                          color: AppColors.textMuted,
                         ),
                       ),
                       if (workspace.verificationStatusName.isNotEmpty) ...[
@@ -352,7 +364,7 @@ class _SearchResultCard extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: workspace.isVerified
                                 ? AppColors.success.withAlpha(20)
-                                : cs.surfaceContainerHighest,
+                                : AppColors.metallicLight,
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -362,7 +374,7 @@ class _SearchResultCard extends StatelessWidget {
                               fontWeight: FontWeight.w600,
                               color: workspace.isVerified
                                   ? AppColors.success
-                                  : cs.onSurfaceVariant,
+                                  : AppColors.textMuted,
                             ),
                           ),
                         ),
@@ -374,138 +386,6 @@ class _SearchResultCard extends StatelessWidget {
             ),
             const SizedBox(width: 10),
 
-            _JoinButton(
-              isProcessing: isProcessing,
-              isRequested: isRequested,
-              onJoin: onJoin,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Workspace join card ────────────────────────────────────────
-
-class _WorkspaceJoinCard extends StatelessWidget {
-  const _WorkspaceJoinCard({
-    required this.workspace,
-    required this.isProcessing,
-    required this.isRequested,
-    required this.onJoin,
-  });
-
-  final WorkspaceEntity workspace;
-  final bool isProcessing;
-  final bool isRequested;
-  final VoidCallback onJoin;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Row(
-          children: [
-            // Avatar
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                gradient: AppColors.blueGradient,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Center(
-                child: Text(
-                  workspace.name.isNotEmpty
-                      ? workspace.name[0].toUpperCase()
-                      : 'W',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-
-            // Info
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          workspace.name,
-                          style: AppTypography.cardTitle,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (workspace.isVerified)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 4),
-                          child: Icon(
-                            Icons.verified_rounded,
-                            size: 16,
-                            color: AppColors.blue,
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    workspace.workspaceType,
-                    style: AppTypography.caption.copyWith(
-                      color: cs.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.people_outline,
-                        size: 13,
-                        color: cs.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        AppLocalizations.of(
-                          context,
-                        ).joinWorkspaceMemberCount(workspace.memberCount),
-                        style: AppTypography.caption.copyWith(
-                          color: cs.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Icon(
-                        Icons.poll_outlined,
-                        size: 13,
-                        color: cs.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        AppLocalizations.of(
-                          context,
-                        ).joinWorkspacePollCount(workspace.pollCount),
-                        style: AppTypography.caption.copyWith(
-                          color: cs.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 10),
-
-            // Action button
             _JoinButton(
               isProcessing: isProcessing,
               isRequested: isRequested,

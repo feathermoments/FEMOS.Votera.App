@@ -8,6 +8,7 @@ import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/storage/local_storage.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/theme_cubit.dart';
+import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_bloc.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_event.dart';
 import 'package:votera_app/features/user/domain/repositories/iuser_repository.dart';
@@ -263,8 +264,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context).settingsScreenTitle),
+      appBar: GradientAppBar(
+        title: AppLocalizations.of(context).settingsScreenTitle,
       ),
       body: _deletingAccount
           ? const Center(child: CircularProgressIndicator())

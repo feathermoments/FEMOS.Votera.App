@@ -59,6 +59,8 @@ abstract interface class IWorkspaceRepository {
     required int userId,
   });
 
+  Future<void> exitWorkspace({required int workspaceId});
+
   Future<WorkspaceInviteLinkEntity> createInviteLink({
     required int workspaceId,
     required String expiryDate,

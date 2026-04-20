@@ -5,6 +5,7 @@ import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/storage/secure_storage.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
+import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/features/poll/domain/entities/poll_entity.dart';
 import 'package:votera_app/features/poll/presentation/cubit/poll_cubit.dart';
 
@@ -102,13 +103,7 @@ class _PollDetailViewState extends State<_PollDetailView> {
         if (!didPop) Navigator.of(context).pop(_hasVoted);
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            _detail?.workspaceName ?? 'Poll',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
+        appBar: GradientAppBar(title: _detail?.workspaceName ?? 'Poll'),
         body: BlocConsumer<PollCubit, PollState>(
           listener: (context, state) async {
             if (state is PollDetailLoaded) {

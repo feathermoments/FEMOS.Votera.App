@@ -161,6 +161,17 @@ class WorkspaceRemoteDataSource {
     }
   }
 
+  Future<void> exitWorkspace(Map<String, dynamic> body) async {
+    try {
+      await _client.post<Map<String, dynamic>>(
+        ApiRoutes.exitWorkspace,
+        data: body,
+      );
+    } on DioException catch (e) {
+      _throw(e);
+    }
+  }
+
   Future<Map<String, dynamic>> createInviteLink(
     Map<String, dynamic> body,
   ) async {

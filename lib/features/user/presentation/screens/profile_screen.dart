@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
+import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/features/user/domain/entities/user_profile_entity.dart';
 import 'package:votera_app/features/user/presentation/cubit/user_cubit.dart';
 import 'package:votera_app/features/user/presentation/cubit/user_state.dart';
@@ -64,8 +65,8 @@ class _ProfileViewState extends State<_ProfileView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context).profileScreenTitle),
+      appBar: GradientAppBar(
+        title: AppLocalizations.of(context).profileScreenTitle,
         actions: [
           BlocBuilder<UserCubit, UserState>(
             builder: (context, state) {
@@ -76,7 +77,10 @@ class _ProfileViewState extends State<_ProfileView> {
                     child: SizedBox(
                       width: 20,
                       height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 );
@@ -88,7 +92,10 @@ class _ProfileViewState extends State<_ProfileView> {
                     if (profile != null) _populate(profile);
                     setState(() => _editing = true);
                   },
-                  child: Text(AppLocalizations.of(context).profileEditButton),
+                  child: Text(
+                    AppLocalizations.of(context).profileEditButton,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 );
               }
               return Row(
@@ -98,11 +105,18 @@ class _ProfileViewState extends State<_ProfileView> {
                     onPressed: () => setState(() => _editing = false),
                     child: Text(
                       AppLocalizations.of(context).profileCancelButton,
+                      style: const TextStyle(color: Colors.white70),
                     ),
                   ),
                   TextButton(
                     onPressed: () => _save(context),
-                    child: Text(AppLocalizations.of(context).profileSaveButton),
+                    child: Text(
+                      AppLocalizations.of(context).profileSaveButton,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ],
               );

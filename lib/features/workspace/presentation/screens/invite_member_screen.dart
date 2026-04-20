@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
+import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_cubit.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_state.dart';
@@ -71,8 +72,8 @@ class _InviteMemberViewState extends State<_InviteMemberView> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(AppLocalizations.of(context).inviteMemberTitle),
+        appBar: GradientAppBar(
+          title: AppLocalizations.of(context).inviteMemberTitle,
         ),
         body: Center(
           child: ConstrainedBox(
@@ -207,6 +208,14 @@ class _InviteMemberViewState extends State<_InviteMemberView> {
                             onPressed: state is WorkspaceLoading
                                 ? null
                                 : _submit,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.blue,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
                             icon: state is WorkspaceLoading
                                 ? const SizedBox(
                                     width: 18,
@@ -221,6 +230,9 @@ class _InviteMemberViewState extends State<_InviteMemberView> {
                               state is WorkspaceLoading
                                   ? 'Sending...'
                                   : 'Send Invitation',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         );

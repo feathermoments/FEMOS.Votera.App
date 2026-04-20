@@ -5,6 +5,7 @@ import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
+import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/features/poll/domain/entities/poll_entity.dart';
 import 'package:votera_app/features/poll/presentation/cubit/poll_cubit.dart';
 import 'package:votera_app/features/user/presentation/cubit/user_cubit.dart';
@@ -75,10 +76,13 @@ class _PollsListViewState extends State<_PollsListView>
         userState.profile.workspaces.isNotEmpty;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context).pollsListTitle),
+      appBar: GradientAppBar(
+        title: AppLocalizations.of(context).pollsListTitle,
         bottom: TabBar(
           controller: _tabs,
+          indicatorColor: Colors.white,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
           tabs: const [
             Tab(text: 'Active'),
             Tab(text: 'Closed'),
@@ -253,9 +257,26 @@ class _PollTab extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(emptyIcon, size: 52, color: AppColors.textFaint),
-            const SizedBox(height: 12),
-            Text(emptyMessage, style: AppTypography.caption),
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: AppColors.blue.withAlpha(12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                emptyIcon,
+                size: 34,
+                color: AppColors.blue.withAlpha(100),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              emptyMessage,
+              style: AppTypography.sectionHeading.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
           ],
         ),
       );

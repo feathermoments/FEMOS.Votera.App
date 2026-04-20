@@ -151,6 +151,11 @@ class WorkspaceRepositoryImpl implements IWorkspaceRepository {
   }
 
   @override
+  Future<void> exitWorkspace({required int workspaceId}) {
+    return _dataSource.exitWorkspace({'workspaceId': workspaceId});
+  }
+
+  @override
   Future<WorkspaceInviteLinkEntity> createInviteLink({
     required int workspaceId,
     required String expiryDate,

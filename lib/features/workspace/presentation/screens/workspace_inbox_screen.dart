@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
+import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
 import 'package:votera_app/features/workspace/domain/entities/workspace_entity.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_cubit.dart';
@@ -46,8 +47,8 @@ class _WorkspaceInboxViewState extends State<_WorkspaceInboxView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context).workspaceInboxTitle),
+      appBar: GradientAppBar(
+        title: AppLocalizations.of(context).workspaceInboxTitle,
       ),
       body: BlocConsumer<WorkspaceCubit, WorkspaceState>(
         listener: (context, state) {
@@ -82,26 +83,39 @@ class _WorkspaceInboxViewState extends State<_WorkspaceInboxView> {
           }
           if (_invites.isEmpty) {
             return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.mark_email_unread_outlined,
-                    size: 64,
-                    color: AppColors.textFaint,
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    'No pending invites',
-                    style: AppTypography.sectionHeading,
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Workspace invitations will appear here',
-                    style: AppTypography.caption,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.all(40),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        color: AppColors.blue.withAlpha(12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.mark_email_unread_outlined,
+                        size: 34,
+                        color: AppColors.blue.withAlpha(100),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No pending invites',
+                      style: AppTypography.sectionHeading.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Workspace invitations will appear here',
+                      style: AppTypography.caption,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
             );
           }
@@ -153,11 +167,11 @@ class _InviteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(14),
-        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+        border: Border.all(color: AppColors.metallicBorder, width: 0.8),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),

@@ -5,6 +5,7 @@ import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
+import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/features/category/domain/entities/category_entity.dart';
 import 'package:votera_app/features/category/presentation/cubit/category_cubit.dart';
 import 'package:votera_app/features/poll/presentation/cubit/poll_cubit.dart';
@@ -235,8 +236,8 @@ class _AddPollFormState extends State<_AddPollForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context).addPollScreenTitle),
+      appBar: GradientAppBar(
+        title: AppLocalizations.of(context).addPollScreenTitle,
       ),
       body: BlocListener<WorkspaceCubit, WorkspaceState>(
         listener: (context, state) {

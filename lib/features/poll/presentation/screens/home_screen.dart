@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:votera_app/core/l10n/app_localizations.dart';
+import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 
 import '../cubit/poll_cubit.dart';
 
@@ -23,7 +24,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context).pollsHomeTitle)),
+      appBar: GradientAppBar(
+        title: AppLocalizations.of(context).pollsHomeTitle,
+      ),
       body: BlocBuilder<PollCubit, PollState>(
         builder: (context, state) {
           if (state is PollLoading) {

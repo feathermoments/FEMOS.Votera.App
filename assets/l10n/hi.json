@@ -210,5 +210,13 @@
   "pollsListTitle": "मेरे पोल",
   "pollsHomeTitle": "पोल",
   "notificationsTitle": "सूचनाएं",
-  "notificationsRetry": "पुनः प्रयास करें"
+  "notificationsRetry": "पुनः प्रयास करें",
+
+  "workspaceLeaveButton": "वर्कस्पेस छोड़ें",
+  "workspaceLeaveDialogTitle": "वर्कस्पेस छोड़ें",
+  "workspaceLeaveDialogBody": "आप छोड़ने वाले हैं ",
+  "workspaceLeaveDialogBodySuffix": ". आपकी सभी पोल और वर्कस्पेस डेटा तक पहुंच तुरंत समाप्त हो जाएगी।",
+  "workspaceLeaveDialogWarning": "यह क्रिया पूर्ववत नहीं की जा सकती। पुनः जुड़ने के लिए किसी एडमिन से संपर्क करें।",
+  "workspaceLeaveConfirm": "छोड़ें",
+  "workspaceLeaveCancel": "रद्द करें"
 }

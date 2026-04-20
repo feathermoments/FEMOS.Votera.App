@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
+import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/features/notification/domain/entities/notification_entity.dart';
 import 'package:votera_app/features/notification/presentation/cubit/notification_cubit.dart';
 import 'package:votera_app/features/notification/presentation/cubit/notification_state.dart';
@@ -30,8 +31,8 @@ class _NotificationsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context).notificationsTitle),
+      appBar: GradientAppBar(
+        title: AppLocalizations.of(context).notificationsTitle,
         actions: [
           BlocBuilder<NotificationCubit, NotificationState>(
             builder: (context, state) {
@@ -42,7 +43,7 @@ class _NotificationsView extends StatelessWidget {
                   child: Text(
                     'Mark all read',
                     style: TextStyle(
-                      color: AppColors.blue,
+                      color: Colors.white,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                     ),
@@ -290,6 +291,12 @@ class _NotificationTile extends StatelessWidget {
                             color: AppColors.blue,
                             shape: BoxShape.circle,
                           ),
+                        )
+                      else
+                        const Icon(
+                          Icons.done_all_rounded,
+                          size: 16,
+                          color: AppColors.blue,
                         ),
                     ],
                   ),

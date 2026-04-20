@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
+import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/features/workspace/domain/entities/workspace_entity.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_cubit.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_state.dart';
@@ -24,8 +25,8 @@ class WorkspaceInviteLinksScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!_isAdmin) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text(AppLocalizations.of(context).workspaceInviteLinksTitle),
+        appBar: GradientAppBar(
+          title: AppLocalizations.of(context).workspaceInviteLinksTitle,
         ),
         body: Center(
           child: Padding(
@@ -125,8 +126,8 @@ class _InviteLinksViewState extends State<_InviteLinksView> {
       },
       builder: (context, state) {
         return Scaffold(
-          appBar: AppBar(
-            title: Text(AppLocalizations.of(context).workspaceInviteLinksTitle),
+          appBar: GradientAppBar(
+            title: AppLocalizations.of(context).workspaceInviteLinksTitle,
           ),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: _showCreateSheet,
@@ -244,7 +245,12 @@ class _InviteLinkCard extends StatelessWidget {
         !isExpired &&
         !isExhausted;
 
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.metallicBorder, width: 0.8),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

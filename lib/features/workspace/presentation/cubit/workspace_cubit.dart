@@ -206,6 +206,16 @@ class WorkspaceCubit extends Cubit<WorkspaceState> {
     }
   }
 
+  Future<void> exitWorkspace({required int workspaceId}) async {
+    emit(const WorkspaceLoading());
+    try {
+      await _repository.exitWorkspace(workspaceId: workspaceId);
+      emit(const WorkspaceExitSuccess());
+    } catch (e) {
+      emit(WorkspaceError(e.toString()));
+    }
+  }
+
   Future<void> searchWorkspaces({
     String? search,
     int? workspaceTypeId,
