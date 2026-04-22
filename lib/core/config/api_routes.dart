@@ -56,6 +56,7 @@ abstract final class ApiRoutes {
 
   // ── Notification ────────────────────────────────────────
   static const notifications = '/notification/list';
+  static const registerToken = '/notification/register-token';
   static String markNotificationRead(int id) => '/notification/read/$id';
   static const markAllNotificationsRead = '/notification/read-all';
 }

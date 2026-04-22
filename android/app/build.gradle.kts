@@ -61,3 +61,6 @@ android {
 flutter {
     source = "../.."
 }
+
+// Apply the Google services plugin to enable Firebase on Android.
+apply(plugin = "com.google.gms.google-services")

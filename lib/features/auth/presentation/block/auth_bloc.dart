@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:votera_app/core/di/service_locator.dart';
+import 'package:votera_app/core/services/push_notification_service.dart';
 import 'package:votera_app/core/storage/secure_storage.dart';
 import 'package:votera_app/features/auth/domain/entities/user_entity.dart';
 import 'package:votera_app/features/auth/domain/repositories/iauth_repository.dart';
@@ -49,6 +50,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         otp: event.otp,
       );
       emit(AuthAuthenticated(user: user));
+      // After successful auth, send saved FCM token to backend (if any).
+      try {
+        sl<PushNotificationService>().sendSavedTokenIfAuth();
+      } catch (_) {}
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -75,6 +80,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         ),
       ),
     );
+    // Attempt to send saved FCM token now that auth is present.
+    try {
+      sl<PushNotificationService>().sendSavedTokenIfAuth();
+    } catch (_) {}
   }
 
   /// Decodes the JWT payload and checks whether the `exp` claim is in the past.
