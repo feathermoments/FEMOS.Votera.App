@@ -5,6 +5,7 @@ import 'package:votera_app/core/storage/secure_storage.dart';
 import 'package:votera_app/features/notification/data/datasources/notification_remote_datasource.dart';
 import 'package:votera_app/firebase_options.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 /// Handles Firebase Messaging initialization and FCM device token management.
 class PushNotificationService {
@@ -82,10 +83,12 @@ class PushNotificationService {
             await _secureStorage.setFcmToken(token);
             try {
               final appVersion = await _getAppVersion();
+              final deviceTypeId = await _detectDeviceType();
+              final deviceName = await _deviceName();
               await _remote.registerDeviceToken(
                 token: token,
-                deviceTypeId: _detectDeviceType(),
-                deviceName: _deviceName(),
+                deviceTypeId: deviceTypeId,
+                deviceName: deviceName,
                 appVersion: appVersion,
               );
             } catch (e) {
@@ -99,10 +102,12 @@ class PushNotificationService {
               await _secureStorage.setFcmToken(newToken);
               try {
                 final appVersion = await _getAppVersion();
+                final deviceTypeId = await _detectDeviceType();
+                final deviceName = await _deviceName();
                 await _remote.registerDeviceToken(
                   token: newToken,
-                  deviceTypeId: _detectDeviceType(),
-                  deviceName: _deviceName(),
+                  deviceTypeId: deviceTypeId,
+                  deviceName: deviceName,
                   appVersion: appVersion,
                 );
               } catch (e) {
@@ -141,10 +146,12 @@ class PushNotificationService {
           await _secureStorage.setFcmToken(token);
           try {
             final appVersion = await _getAppVersion();
+            final deviceTypeId = await _detectDeviceType();
+            final deviceName = await _deviceName();
             await _remote.registerDeviceToken(
               token: token,
-              deviceTypeId: _detectDeviceType(),
-              deviceName: _deviceName(),
+              deviceTypeId: deviceTypeId,
+              deviceName: deviceName,
               appVersion: appVersion,
             );
           } catch (e) {
@@ -158,10 +165,12 @@ class PushNotificationService {
             await _secureStorage.setFcmToken(newToken);
             try {
               final appVersion = await _getAppVersion();
+              final deviceTypeId = await _detectDeviceType();
+              final deviceName = await _deviceName();
               await _remote.registerDeviceToken(
                 token: newToken,
-                deviceTypeId: _detectDeviceType(),
-                deviceName: _deviceName(),
+                deviceTypeId: deviceTypeId,
+                deviceName: deviceName,
                 appVersion: appVersion,
               );
             } catch (e) {
@@ -202,10 +211,12 @@ class PushNotificationService {
       final token = await _secureStorage.getFcmToken();
       if (token == null || token.isEmpty) return;
       final appVersion = await _getAppVersion();
+      final deviceTypeId = await _detectDeviceType();
+      final deviceName = await _deviceName();
       await _remote.registerDeviceToken(
         token: token,
-        deviceTypeId: _detectDeviceType(),
-        deviceName: _deviceName(),
+        deviceTypeId: deviceTypeId,
+        deviceName: deviceName,
         appVersion: appVersion,
       );
     } catch (e) {
@@ -226,16 +237,61 @@ class PushNotificationService {
     }
   }
 
-  int _detectDeviceType() {
-    // DeviceTypeId mapping (example): 1=Android,2=iOS,3=Web
-    if (kIsWeb) return 3;
-    // There's no direct Platform import to avoid bringing dart:io on web.
-    // Use default: 1 (Android) — caller can adjust if needed.
-    return 1;
+  Future<int> _detectDeviceType() async {
+    // DeviceTypeId mapping: 2=Android,3=iOS,1=Web,4=Other
+    if (kIsWeb) return 1;
+    final platform = defaultTargetPlatform;
+    if (platform == TargetPlatform.android) return 2;
+    if (platform == TargetPlatform.iOS) return 3;
+    return 4;
   }
 
-  String _deviceName() {
-    // Return a simple device name placeholder. Could be improved with device_info_plus.
+  Future<String> _deviceName() async {
+    try {
+      final plugin = DeviceInfoPlugin();
+      if (kIsWeb) {
+        final info = await plugin.webBrowserInfo;
+        final name = info.browserName.toString();
+        final agent = info.userAgent ?? '';
+        return ('$name ${agent.isNotEmpty ? ' - $agent' : ''}').trim();
+      }
+
+      final platform = defaultTargetPlatform;
+      if (platform == TargetPlatform.android) {
+        final info = await plugin.androidInfo;
+        final manufacturer = info.manufacturer;
+        final model = info.model;
+        return ('$manufacturer $model').trim();
+      }
+
+      if (platform == TargetPlatform.iOS) {
+        final info = await plugin.iosInfo;
+        final name = info.name;
+        final model = info.utsname.machine;
+        return ('$name $model').trim();
+      }
+
+      if (platform == TargetPlatform.macOS) {
+        final info = await plugin.macOsInfo;
+        return info.computerName;
+      }
+
+      if (platform == TargetPlatform.windows) {
+        final info = await plugin.windowsInfo;
+        return info.computerName;
+      }
+
+      if (platform == TargetPlatform.linux) {
+        final info = await plugin.linuxInfo;
+        return info.name;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        // ignore: avoid_print
+        print('Failed to read device info: $e');
+      }
+    }
+
     return kIsWeb ? 'web' : 'device';
   }
 }
