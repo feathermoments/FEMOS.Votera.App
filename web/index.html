@@ -33,6 +33,18 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-messaging-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    try {
+      firebase.initializeApp(firebaseConfig);
+    } catch (e) {
+      // ignore init errors
+      console.warn('Firebase init error', e);
+    }
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

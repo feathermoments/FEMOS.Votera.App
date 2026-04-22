@@ -39,4 +39,13 @@ class SecureStorageService {
     final token = await getAccessToken();
     return token != null && token.isNotEmpty;
   }
+
+  static const _fcmTokenKey = 'fcm_token';
+
+  Future<String?> getFcmToken() => _storage.read(key: _fcmTokenKey);
+
+  Future<void> setFcmToken(String token) =>
+      _storage.write(key: _fcmTokenKey, value: token);
+
+  Future<void> deleteFcmToken() => _storage.delete(key: _fcmTokenKey);
 }

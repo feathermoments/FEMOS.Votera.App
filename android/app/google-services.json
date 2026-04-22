@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "105535083242",
+    "project_id": "votera-6ffda",
+    "storage_bucket": "votera-6ffda.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:105535083242:android:bbe5790a923caa24dc7d93",
+        "android_client_info": {
+          "package_name": "com.feathermoments.votera"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1HLkWJh7bZYk6GU_RgqCwfbldlnS9IOg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

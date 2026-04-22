@@ -1,7 +1,9 @@
 import 'package:get_it/get_it.dart';
+import 'package:votera_app/core/config/app_config.dart';
 import 'package:votera_app/core/network/api_client.dart';
 import 'package:votera_app/core/storage/local_storage.dart';
 import 'package:votera_app/core/storage/secure_storage.dart';
+import 'package:votera_app/core/services/push_notification_service.dart';
 
 // Auth
 import 'package:votera_app/features/auth/data/datasources/auth_remote_datasource.dart';
@@ -137,4 +139,20 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<INotificationRepository>(
     () => NotificationRepositoryImpl(sl()),
   );
+
+  // ── Push notifications (FCM) ───────────────────────────────────────────
+  sl.registerLazySingleton<PushNotificationService>(
+    () => PushNotificationService(
+      sl<SecureStorageService>(),
+      sl<NotificationRemoteDataSource>(),
+      vapidKey: AppConfig.firebaseVapidKey.isEmpty
+          ? null
+          : AppConfig.firebaseVapidKey,
+    ),
+  );
+
+  // Initialize FCM after all services are registered.
+  try {
+    await sl<PushNotificationService>().init();
+  } catch (_) {}
 }

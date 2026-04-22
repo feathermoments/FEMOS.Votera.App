@@ -3,10 +3,13 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:app_links/app_links.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:votera_app/core/config/app_config.dart';
+import 'package:votera_app/core/di/service_locator.dart';
+import 'package:votera_app/core/services/push_notification_service.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/widgets/powered_by_footer.dart';
@@ -59,6 +62,27 @@ class _SplashScreenState extends State<SplashScreen>
       _timerDone = true;
       _tryNavigate();
     });
+
+    // Debug: show saved FCM token as a snackbar so we can verify generation.
+    if (kDebugMode) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        try {
+          final svc = sl<PushNotificationService>();
+          final token = await svc.getSavedToken();
+          if (token != null && token.isNotEmpty && mounted) {
+            final display = token.length > 64
+                ? '${token.substring(0, 64)}...'
+                : token;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('FCM token: $display'),
+                duration: const Duration(seconds: 6),
+              ),
+            );
+          }
+        } catch (_) {}
+      });
+    }
   }
 
   Future<void> _loadRandomQuote() async {

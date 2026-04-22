@@ -37,6 +37,32 @@ class NotificationRemoteDataSource {
     }
   }
 
+  /// Registers the device token with the backend.
+  /// Payload matches: { objUserTokenInfo: { Token, DeviceTypeId, DeviceName, AppVersion } }
+  Future<void> registerDeviceToken({
+    required String token,
+    required int deviceTypeId,
+    required String deviceName,
+    String appVersion = '',
+  }) async {
+    try {
+      final body = {
+        'objUserTokenInfo': {
+          'Token': token,
+          'DeviceTypeId': deviceTypeId,
+          'DeviceName': deviceName,
+          'AppVersion': appVersion,
+        },
+      };
+      await _client.patch<Map<String, dynamic>>(
+        ApiRoutes.registerToken,
+        data: body,
+      );
+    } on DioException catch (e) {
+      _throw(e, 'Failed to register device token');
+    }
+  }
+
   Never _throw(DioException e, String fallback) {
     final msg =
         (e.response?.data as Map?)?['message'] as String? ??
