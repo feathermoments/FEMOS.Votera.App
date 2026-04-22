@@ -9,6 +9,7 @@ import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/features/workspace/domain/entities/workspace_entity.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_cubit.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_state.dart';
+import 'package:votera_app/core/config/app_config.dart';
 
 class WorkspaceListScreen extends StatelessWidget {
   const WorkspaceListScreen({super.key});
@@ -49,6 +50,7 @@ class _WorkspaceListView extends StatelessWidget {
           if (state is WorkspaceError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
+                duration: AppConfig.toastDuration,
                 content: Text(state.message),
                 backgroundColor: AppColors.error,
               ),

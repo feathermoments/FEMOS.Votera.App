@@ -12,6 +12,7 @@ import 'package:votera_app/features/poll/presentation/cubit/poll_cubit.dart';
 import 'package:votera_app/features/workspace/domain/entities/workspace_entity.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_cubit.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_state.dart';
+import 'package:votera_app/core/config/app_config.dart';
 
 class AddPollScreen extends StatelessWidget {
   const AddPollScreen({super.key});
@@ -96,16 +97,22 @@ class _AddPollFormState extends State<_AddPollForm> {
     if (!_formKey.currentState!.validate()) return;
     if (_workspaceId == null) {
       final l10n = AppLocalizations.of(context);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.addPollNoWorkspaceSnackbar)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: AppConfig.toastDuration,
+          content: Text(l10n.addPollNoWorkspaceSnackbar),
+        ),
+      );
       return;
     }
     if (_categoryId == null) {
       final l10n = AppLocalizations.of(context);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.addPollNoCategorySnackbar)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: AppConfig.toastDuration,
+          content: Text(l10n.addPollNoCategorySnackbar),
+        ),
+      );
       return;
     }
 
@@ -258,6 +265,7 @@ class _AddPollFormState extends State<_AddPollForm> {
             } else if (state is PollError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
+                  duration: AppConfig.toastDuration,
                   content: Text(state.message),
                   backgroundColor: AppColors.error,
                 ),

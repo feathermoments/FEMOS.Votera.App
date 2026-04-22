@@ -8,6 +8,7 @@ import 'package:votera_app/core/theme/app_typography.dart';
 import 'package:votera_app/features/workspace/domain/entities/workspace_entity.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_cubit.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_state.dart';
+import 'package:votera_app/core/config/app_config.dart';
 
 class JoinWorkspaceScreen extends StatelessWidget {
   const JoinWorkspaceScreen({super.key});
@@ -151,6 +152,7 @@ class _JoinWorkspaceViewState extends State<_JoinWorkspaceView> {
                       }
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
+                          duration: AppConfig.toastDuration,
                           content: Text(state.message),
                           backgroundColor: AppColors.success,
                         ),
@@ -159,6 +161,7 @@ class _JoinWorkspaceViewState extends State<_JoinWorkspaceView> {
                       setState(() => _processing.clear());
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
+                          duration: AppConfig.toastDuration,
                           content: Text(state.message),
                           backgroundColor: AppColors.error,
                         ),

@@ -9,6 +9,7 @@ import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/features/workspace/domain/entities/workspace_entity.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_cubit.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_state.dart';
+import 'package:votera_app/core/config/app_config.dart';
 
 class WorkspaceDetailScreen extends StatefulWidget {
   const WorkspaceDetailScreen({super.key, required this.workspaceId});
@@ -240,6 +241,7 @@ class _WorkspaceDetailScreenState extends State<WorkspaceDetailScreen>
           } else if (state is WorkspaceActionSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
+                duration: AppConfig.toastDuration,
                 content: Text(state.message),
                 backgroundColor: AppColors.success,
               ),
@@ -249,6 +251,7 @@ class _WorkspaceDetailScreenState extends State<WorkspaceDetailScreen>
           } else if (state is WorkspaceExitSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
+                duration: AppConfig.toastDuration,
                 content: Text('You have left the workspace'),
                 backgroundColor: AppColors.success,
               ),
@@ -257,6 +260,7 @@ class _WorkspaceDetailScreenState extends State<WorkspaceDetailScreen>
           } else if (state is WorkspaceError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
+                duration: AppConfig.toastDuration,
                 content: Text(state.message),
                 backgroundColor: AppColors.error,
               ),
@@ -1082,6 +1086,7 @@ class _MemberTile extends StatelessWidget {
                   } else if (value == 'report') {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
+                        duration: AppConfig.toastDuration,
                         content: Text('Reported ${member.name}'),
                         backgroundColor: AppColors.warning,
                       ),

@@ -6,6 +6,7 @@ import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/widgets/gradient_app_bar.dart';
+import 'package:votera_app/core/config/app_config.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_bloc.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_event.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_state.dart';
@@ -135,12 +136,14 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
         } else if (state is OtpSent) {
           ScaffoldMessenger.of(ctx).showSnackBar(
             SnackBar(
+              duration: AppConfig.toastDuration,
               content: Text(AppLocalizations.of(ctx).verifyOtpResendSuccess),
             ),
           );
         } else if (state is AuthError) {
           ScaffoldMessenger.of(ctx).showSnackBar(
             SnackBar(
+              duration: AppConfig.toastDuration,
               content: Text(state.message),
               backgroundColor: AppColors.error,
             ),

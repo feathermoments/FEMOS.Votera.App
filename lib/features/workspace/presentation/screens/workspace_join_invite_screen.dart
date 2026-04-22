@@ -9,6 +9,7 @@ import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/features/workspace/domain/entities/workspace_entity.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_cubit.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_state.dart';
+import 'package:votera_app/core/config/app_config.dart';
 
 /// Entry point — checks auth then delegates to the inner view.
 class WorkspaceJoinInviteScreen extends StatelessWidget {
@@ -72,6 +73,7 @@ class _JoinInviteGateState extends State<_JoinInviteGate> {
         if (state is WorkspaceActionSuccess) {
           ScaffoldMessenger.of(ctx).showSnackBar(
             SnackBar(
+              duration: AppConfig.toastDuration,
               content: Text(state.message),
               backgroundColor: AppColors.success,
             ),
@@ -84,6 +86,7 @@ class _JoinInviteGateState extends State<_JoinInviteGate> {
         } else if (state is WorkspaceError) {
           ScaffoldMessenger.of(ctx).showSnackBar(
             SnackBar(
+              duration: AppConfig.toastDuration,
               content: Text(state.message),
               backgroundColor: AppColors.error,
             ),

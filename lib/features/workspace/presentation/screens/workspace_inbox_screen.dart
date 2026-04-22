@@ -8,6 +8,7 @@ import 'package:votera_app/core/theme/app_typography.dart';
 import 'package:votera_app/features/workspace/domain/entities/workspace_entity.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_cubit.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_state.dart';
+import 'package:votera_app/core/config/app_config.dart';
 
 class WorkspaceInboxScreen extends StatelessWidget {
   const WorkspaceInboxScreen({super.key, required this.userId});
@@ -57,6 +58,7 @@ class _WorkspaceInboxViewState extends State<_WorkspaceInboxView> {
           } else if (state is WorkspaceActionSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
+                duration: AppConfig.toastDuration,
                 content: Text(state.message),
                 backgroundColor: AppColors.success,
               ),
@@ -68,6 +70,7 @@ class _WorkspaceInboxViewState extends State<_WorkspaceInboxView> {
             setState(() => _processing.clear());
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
+                duration: AppConfig.toastDuration,
                 content: Text(state.message),
                 backgroundColor: AppColors.error,
               ),

@@ -7,6 +7,7 @@ import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/features/user/domain/entities/user_profile_entity.dart';
 import 'package:votera_app/features/user/presentation/cubit/user_cubit.dart';
 import 'package:votera_app/features/user/presentation/cubit/user_state.dart';
+import 'package:votera_app/core/config/app_config.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -130,6 +131,7 @@ class _ProfileViewState extends State<_ProfileView> {
             setState(() => _editing = false);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
+                duration: AppConfig.toastDuration,
                 content: Text(
                   AppLocalizations.of(context).profileUpdatedSnackbar,
                 ),
@@ -137,9 +139,12 @@ class _ProfileViewState extends State<_ProfileView> {
             );
           }
           if (state is UserError) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                duration: AppConfig.toastDuration,
+                content: Text(state.message),
+              ),
+            );
           }
         },
         builder: (context, state) {

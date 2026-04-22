@@ -10,6 +10,7 @@ import 'package:votera_app/features/poll/domain/entities/poll_entity.dart';
 import 'package:votera_app/features/poll/presentation/cubit/poll_cubit.dart';
 import 'package:votera_app/features/user/presentation/cubit/user_cubit.dart';
 import 'package:votera_app/features/user/presentation/cubit/user_state.dart';
+import 'package:votera_app/core/config/app_config.dart';
 
 class PollsListScreen extends StatelessWidget {
   const PollsListScreen({super.key, required this.userId});
@@ -101,6 +102,7 @@ class _PollsListViewState extends State<_PollsListView>
           if (state is PollError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
+                duration: AppConfig.toastDuration,
                 content: Text(state.message),
                 backgroundColor: AppColors.error,
               ),

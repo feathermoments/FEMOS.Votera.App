@@ -5,6 +5,7 @@ import 'package:votera_app/core/l10n/app_localizations.dart';
 import 'package:votera_app/core/responsive/responsive_utils.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
+import 'package:votera_app/core/config/app_config.dart';
 import 'package:votera_app/core/widgets/powered_by_footer.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_bloc.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_event.dart';
@@ -111,6 +112,7 @@ class _LoginScreenState extends State<LoginScreen>
           } else if (state is AuthError) {
             ScaffoldMessenger.of(ctx).showSnackBar(
               SnackBar(
+                duration: AppConfig.toastDuration,
                 content: Text(state.message),
                 backgroundColor: AppColors.error,
               ),

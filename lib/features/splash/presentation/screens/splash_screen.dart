@@ -6,6 +6,7 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:votera_app/core/config/app_config.dart';
 import 'package:votera_app/core/router/route_names.dart';
 import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/widgets/powered_by_footer.dart';
@@ -54,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen>
     _checkInitialLink();
 
     // Minimum splash display time.
-    Timer(const Duration(seconds: 3), () {
+    Timer(AppConfig.splashDuration, () {
       _timerDone = true;
       _tryNavigate();
     });

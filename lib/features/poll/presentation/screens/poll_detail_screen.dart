@@ -8,6 +8,7 @@ import 'package:votera_app/core/theme/app_typography.dart';
 import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/features/poll/domain/entities/poll_entity.dart';
 import 'package:votera_app/features/poll/presentation/cubit/poll_cubit.dart';
+import 'package:votera_app/core/config/app_config.dart';
 
 class PollDetailScreen extends StatelessWidget {
   const PollDetailScreen({
@@ -216,6 +217,7 @@ class _PollDetailViewState extends State<_PollDetailView> {
               });
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
+                  duration: AppConfig.toastDuration,
                   content: Text(state.message),
                   backgroundColor: AppColors.error,
                 ),

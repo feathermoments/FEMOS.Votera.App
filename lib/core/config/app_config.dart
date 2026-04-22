@@ -15,7 +15,7 @@ abstract final class AppConfig {
   static const maxFileSize = 10 * 1024 * 1024; // 10 MB
   static const allowedReportTypes = ['pdf', 'jpeg', 'jpg', 'png'];
 
-  static const splashDuration = Duration(milliseconds: 3500);
+  static const splashDuration = Duration(milliseconds: 3000);
   static const toastDuration = Duration(milliseconds: 2500);
 
   static const iosBundleId = 'com.feathermoments.votera';

@@ -8,6 +8,7 @@ import 'package:votera_app/core/widgets/gradient_app_bar.dart';
 import 'package:votera_app/core/theme/app_typography.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_cubit.dart';
 import 'package:votera_app/features/workspace/presentation/cubit/workspace_state.dart';
+import 'package:votera_app/core/config/app_config.dart';
 
 class InviteMemberScreen extends StatelessWidget {
   const InviteMemberScreen({super.key, required this.workspaceId});
@@ -122,6 +123,7 @@ class _InviteMemberViewState extends State<_InviteMemberView> {
         if (state is WorkspaceActionSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
+              duration: AppConfig.toastDuration,
               content: Text(state.message),
               backgroundColor: AppColors.success,
             ),
@@ -130,6 +132,7 @@ class _InviteMemberViewState extends State<_InviteMemberView> {
         } else if (state is WorkspaceError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
+              duration: AppConfig.toastDuration,
               content: Text(state.message),
               backgroundColor: AppColors.error,
             ),
@@ -236,7 +239,7 @@ class _InviteMemberViewState extends State<_InviteMemberView> {
                           : <TextInputFormatter>[],
                       decoration: InputDecoration(
                         hintText: _contactType == 'mobile'
-                            ? '${'0' * _selectedCountry.maxDigits}'
+                            ? '0' * _selectedCountry.maxDigits
                             : 'member@example.com',
                         // ── Country code prefix (mobile only) ───
                         prefix: _contactType == 'mobile'
