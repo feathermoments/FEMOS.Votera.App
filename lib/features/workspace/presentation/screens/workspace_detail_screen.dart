@@ -37,7 +37,8 @@ class _WorkspaceDetailScreenState extends State<WorkspaceDetailScreen>
   }
 
   void _onTabChanged() {
-    if (!_tabs.indexIsChanging) return;
+    if (_tabs.indexIsChanging) return;
+    setState(() {});
     if ((_tabs.index == 1 || _tabs.index == 2) && !_membersLoaded) {
       _cubit.loadMembers(widget.workspaceId);
     }
@@ -250,9 +251,9 @@ class _WorkspaceDetailScreenState extends State<WorkspaceDetailScreen>
             _cubit.loadMembers(widget.workspaceId);
           } else if (state is WorkspaceExitSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+              SnackBar(
                 duration: AppConfig.toastDuration,
-                content: Text('You have left the workspace'),
+                content: const Text('You have left the workspace'),
                 backgroundColor: AppColors.success,
               ),
             );
@@ -513,8 +514,10 @@ class _OverviewTab extends StatelessWidget {
                                   Expanded(
                                     child: Text(
                                       ws.name,
-                                      style: const TextStyle(
-                                        color: Colors.white,
+                                      style: TextStyle(
+                                        color: selected
+                                            ? Colors.white
+                                            : AppColors.textPrimary,
                                         fontSize: 19,
                                         fontWeight: FontWeight.w800,
                                         letterSpacing: -0.3,
@@ -529,22 +532,30 @@ class _OverviewTab extends StatelessWidget {
                                         vertical: 3,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withAlpha(25),
+                                        color: selected
+                                            ? Colors.white.withAlpha(25)
+                                            : AppColors.whiteSurface.withAlpha(
+                                                8,
+                                              ),
                                         borderRadius: BorderRadius.circular(20),
                                       ),
-                                      child: const Row(
+                                      child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Icon(
                                             Icons.verified_rounded,
-                                            color: Colors.white,
+                                            color: selected
+                                                ? Colors.white
+                                                : AppColors.success,
                                             size: 12,
                                           ),
-                                          SizedBox(width: 4),
+                                          const SizedBox(width: 4),
                                           Text(
                                             'Verified',
                                             style: TextStyle(
-                                              color: Colors.white,
+                                              color: selected
+                                                  ? Colors.white
+                                                  : AppColors.textPrimary,
                                               fontSize: 10,
                                               fontWeight: FontWeight.w600,
                                             ),
@@ -558,8 +569,10 @@ class _OverviewTab extends StatelessWidget {
                               const SizedBox(height: 4),
                               Text(
                                 '@${ws.slug}',
-                                style: const TextStyle(
-                                  color: Colors.white60,
+                                style: TextStyle(
+                                  color: selected
+                                      ? Colors.white60
+                                      : AppColors.textMuted,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -579,12 +592,14 @@ class _OverviewTab extends StatelessWidget {
                           icon: Icons.people_outline_rounded,
                           value: '${ws.memberCount}',
                           label: 'Members',
+                          selected: selected,
                         ),
                         const SizedBox(width: 20),
                         _HeroPill(
                           icon: Icons.poll_outlined,
                           value: '${ws.pollCount}',
                           label: 'Polls',
+                          selected: selected,
                         ),
                         const Spacer(),
                         _HeroPill(
@@ -593,6 +608,7 @@ class _OverviewTab extends StatelessWidget {
                               : Icons.lock_outline_rounded,
                           value: ws.isPublic ? 'Public' : 'Private',
                           label: 'Access',
+                          selected: selected,
                         ),
                       ],
                     ),
@@ -719,33 +735,39 @@ class _HeroPill extends StatelessWidget {
     required this.icon,
     required this.value,
     required this.label,
+    required this.selected,
   });
   final IconData icon;
   final String value;
   final String label;
+  final bool selected;
 
   @override
   Widget build(BuildContext context) {
+    final iconColor = selected ? Colors.white70 : AppColors.textMuted;
+    final valueColor = selected ? Colors.white : AppColors.textPrimary;
+    final labelColor = selected ? Colors.white54 : AppColors.textMuted;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: Colors.white70),
+        Icon(icon, size: 14, color: iconColor),
         const SizedBox(width: 6),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               value,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: valueColor,
                 fontSize: 15,
                 fontWeight: FontWeight.w800,
               ),
             ),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.white54,
+              style: TextStyle(
+                color: labelColor,
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
               ),
