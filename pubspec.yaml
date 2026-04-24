@@ -47,6 +47,7 @@ dependencies:
   package_info_plus: ^4.0.0
   firebase_core: ^4.7.0
   firebase_messaging: ^16.2.0
+  flutter_html: ^3.0.0
 
 dependency_overrides:
   firebase_messaging_web: ^4.0.0

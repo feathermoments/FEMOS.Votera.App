@@ -54,6 +54,10 @@ import 'package:votera_app/features/report/domain/repositories/ireport_repositor
 import 'package:votera_app/features/notification/data/datasources/notification_remote_datasource.dart';
 import 'package:votera_app/features/notification/data/repositories/notification_repository_impl.dart';
 import 'package:votera_app/features/notification/domain/repositories/inotification_repository.dart';
+// Terms
+import 'package:votera_app/features/terms/data/datasources/terms_remote_datasource.dart';
+import 'package:votera_app/features/terms/data/repositories/terms_repository_impl.dart';
+import 'package:votera_app/features/terms/domain/repositories/iterms_repository.dart';
 
 final sl = GetIt.instance;
 
@@ -139,6 +143,12 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<INotificationRepository>(
     () => NotificationRepositoryImpl(sl()),
   );
+
+  // ── Terms & Conditions ───────────────────────────────────
+  sl.registerLazySingleton<TermsRemoteDataSource>(
+    () => TermsRemoteDataSource(sl()),
+  );
+  sl.registerLazySingleton<ITermsRepository>(() => TermsRepositoryImpl(sl()));
 
   // ── Push notifications (FCM) ───────────────────────────────────────────
   sl.registerLazySingleton<PushNotificationService>(

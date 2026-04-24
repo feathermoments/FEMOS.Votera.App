@@ -15,6 +15,8 @@ import 'package:votera_app/core/theme/app_colors.dart';
 import 'package:votera_app/core/widgets/powered_by_footer.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_bloc.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_state.dart';
+import 'package:votera_app/features/terms/domain/repositories/iterms_repository.dart';
+import 'package:votera_app/features/terms/presentation/screens/terms_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -38,6 +40,7 @@ class _SplashScreenState extends State<SplashScreen>
   bool _timerDone = false;
   bool _authCheckDone = false;
   bool _isAuthenticated = false;
+  bool _termsCheckDone = false;
 
   @override
   void initState() {
@@ -139,13 +142,44 @@ class _SplashScreenState extends State<SplashScreen>
   void _onAuthResolved({required bool authenticated}) {
     _authCheckDone = true;
     _isAuthenticated = authenticated;
-    _tryNavigate();
+    if (authenticated) {
+      _performTermsCheck();
+    } else {
+      _tryNavigate();
+    }
+  }
+
+  Future<void> _performTermsCheck() async {
+    try {
+      final repo = sl<ITermsRepository>();
+      final validate = await repo.validate(appCode: 'VOTERA');
+      if (validate.isValid) {
+        _termsCheckDone = true;
+        _tryNavigate();
+        return;
+      }
+      // Need to show terms screen. Fetch current terms and navigate there.
+      final current = await repo.getCurrent(
+        appCode: 'VOTERA',
+        termsType: 'TNC',
+      );
+      if (!mounted) return;
+      _navigated = true;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => TermsScreen(terms: current)),
+      );
+    } catch (_) {
+      // If terms check fails, allow navigation to continue to dashboard.
+      _termsCheckDone = true;
+      _tryNavigate();
+    }
   }
 
   /// Navigates only when the timer, the link check, AND auth have all resolved.
   void _tryNavigate() {
     if (!mounted || _navigated) return;
     if (!_timerDone || !_linkCheckDone || !_authCheckDone) return;
+    if (_isAuthenticated && !_termsCheckDone) return;
     _navigated = true;
     if (_pendingInviteCode != null) {
       Navigator.of(context).pushReplacementNamed(

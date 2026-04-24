@@ -10,6 +10,10 @@ import 'package:votera_app/core/config/app_config.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_bloc.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_event.dart';
 import 'package:votera_app/features/auth/presentation/block/auth_state.dart';
+import 'package:votera_app/core/di/service_locator.dart';
+import 'package:votera_app/features/terms/domain/repositories/iterms_repository.dart';
+import 'package:votera_app/features/terms/presentation/screens/terms_screen.dart';
+import 'package:votera_app/features/terms/domain/entities/terms_entity.dart';
 
 class VerifyOtpScreen extends StatefulWidget {
   const VerifyOtpScreen({super.key});
@@ -62,6 +66,8 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
 
   String get _otp => _controllers.map((c) => c.text).join();
 
+  bool _verifyRequested = false;
+
   void _onDigitEntered(int index, String value) {
     final digits = value.replaceAll(RegExp(r'[^0-9]'), '');
 
@@ -97,6 +103,8 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
 
   void _verify(BuildContext ctx) {
     if (_otp.length < 6) return;
+    if (_verifyRequested) return;
+    _verifyRequested = true;
     ctx.read<AuthBloc>().add(
       VerifyOtpRequested(identifier: _identifier, type: _type, otp: _otp),
     );
@@ -123,16 +131,58 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
               _nextRoute!,
               arguments: _nextArgs,
             );
-          } else {
-            Navigator.pushReplacementNamed(
-              ctx,
-              RouteNames.dashboard,
-              arguments: {
-                'isNewUser': state.user.isNewUser,
-                'isProfileComplete': state.user.isProfileComplete,
-              },
-            );
+            return;
           }
+
+          // After successful verification, validate terms for this user.
+          // If validation passes, navigate to dashboard with user flags.
+          // Otherwise fetch current T&C and show TermsScreen before dashboard.
+          (() async {
+            final repo = sl<ITermsRepository>();
+            try {
+              final validate = await repo.validate(appCode: 'VOTERA');
+              if (validate.isValid) {
+                if (!mounted) return;
+                Navigator.pushReplacementNamed(
+                  ctx,
+                  RouteNames.dashboard,
+                  arguments: {
+                    'isNewUser': state.user.isNewUser,
+                    'isProfileComplete': state.user.isProfileComplete,
+                  },
+                );
+                return;
+              }
+
+              final current = await repo.getCurrent(
+                appCode: 'VOTERA',
+                termsType: 'TNC',
+              );
+              if (!mounted) return;
+              Navigator.pushReplacement(
+                ctx,
+                MaterialPageRoute(
+                  builder: (_) => TermsScreen(
+                    terms: current,
+                    postAcceptArgs: {
+                      'isNewUser': state.user.isNewUser,
+                      'isProfileComplete': state.user.isProfileComplete,
+                    },
+                  ),
+                ),
+              );
+            } catch (_) {
+              if (!mounted) return;
+              Navigator.pushReplacementNamed(
+                ctx,
+                RouteNames.dashboard,
+                arguments: {
+                  'isNewUser': state.user.isNewUser,
+                  'isProfileComplete': state.user.isProfileComplete,
+                },
+              );
+            }
+          })();
         } else if (state is OtpSent) {
           ScaffoldMessenger.of(ctx).showSnackBar(
             SnackBar(
@@ -141,6 +191,8 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
             ),
           );
         } else if (state is AuthError) {
+          // Allow retry after an error
+          _verifyRequested = false;
           ScaffoldMessenger.of(ctx).showSnackBar(
             SnackBar(
               duration: AppConfig.toastDuration,
